@@ -2,3 +2,30 @@
 // for details on configuring this project to bundle and minify static web assets.
 
 // Write your JavaScript code.
+
+function UpdateIcon() {
+    let image = $('#icon-upload-btn').val();
+    if (image == null || image == '') {
+        return;
+    }
+    let formData = new FormData();
+
+    formData.append("file", $('#icon-upload-btn').get(0).files[0]);
+
+    $.ajax(
+        {
+            url: "/icon/upload",
+            data: formData,
+            processData: false,
+            contentType: false,
+            type: "POST",
+            success: function (data) {
+                $('#ImageUpload').val(null);
+                $('#Icon').val(data.Data);
+                let icon = document.getElementById('icon-display');
+                icon.src = data.Data;
+            }
+        }
+    );
+
+}
