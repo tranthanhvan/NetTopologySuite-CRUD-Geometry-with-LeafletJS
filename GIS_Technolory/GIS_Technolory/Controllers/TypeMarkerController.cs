@@ -136,7 +136,7 @@ namespace GIS_Technolory.Controllers
             var typeMarker = await _typeMarkerService.Get(id);
             if (typeMarker == null)
             {
-                return Problem("Entity get model  is null.");
+                return Problem("Entity get model is null.");
             }
 
             await _typeMarkerService.Delete(id);
