@@ -14,6 +14,8 @@ builder.Services.AddDbContext<GISContext>(options => options.UseSqlServer(Connec
 
 builder.Services.AddTransient<ITypeMarkerService, TypeMarkerService>();
 builder.Services.AddTransient<ITypePolylineService, TypePolylineService>();
+builder.Services.AddTransient<IMarkerService, MarkerService>();
+builder.Services.AddTransient<IPolylineService, PolylineService>();
 
 builder.Services.AddControllers().AddNewtonsoftJson(opt =>
 {

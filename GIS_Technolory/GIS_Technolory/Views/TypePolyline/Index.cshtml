@@ -4,7 +4,7 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>Type of Polyline</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -40,10 +40,10 @@
                 @Html.DisplayFor(modelItem => item.MapName)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Icon)
+                 <img id="icon-display" src="@item.Icon">
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.ColorLine)
+                 <input type="color" value="@item.ColorLine" disabled />
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.WeightLine)

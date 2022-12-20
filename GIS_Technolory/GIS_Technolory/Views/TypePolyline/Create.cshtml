@@ -35,9 +35,12 @@
                 <input asp-for="Icon" class="form-control" />
                 <span asp-validation-for="Icon" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="ColorLine" class="control-label"></label>
-                <input asp-for="ColorLine" class="form-control" />
+            <div class="form-group" style="margin-top: 10px;">
+                <div>
+                    <input asp-for="ColorLine" type="color" />
+                    <label for="head">Color Line</label>
+                </div>
+               
                 <span asp-validation-for="ColorLine" class="text-danger"></span>
             </div>
             <div class="form-group">
