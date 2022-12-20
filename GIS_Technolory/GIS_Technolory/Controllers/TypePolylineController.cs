@@ -1,35 +1,35 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using GIS_Technolory.DBAccess;
 using GIS_Technolory.Entities;
+using GIS_Technolory.Serivces;
+using GIS_Technolory.Helpers;
 
 namespace GIS_Technolory.Controllers
 {
-    public class TypePolylinesController : Controller
+    public class TypePolylineController : Controller
     {
-        private readonly GISContext _context;
+        private readonly ITypePolylineService _typePolylineService;
 
-        public TypePolylinesController(GISContext context)
+        public TypePolylineController(ITypePolylineService typePolylineService)
         {
-            _context = context;
+            _typePolylineService = typePolylineService;
         }
 
         // GET: TypePolylines
         public async Task<IActionResult> Index()
         {
-              return View(await _context.TypePolylines.ToListAsync());
+              return View(await _typePolylineService.GetList());
         }
 
         // GET: TypePolylines/Details/5
         public async Task<IActionResult> Details(string id)
         {
-            if (id == null || _context.TypePolylines == null)
+            if (id == null || _typePolylineService == null)
             {
                 return NotFound();
             }
 
-            var typePolyline = await _context.TypePolylines
-                .FirstOrDefaultAsync(m => m.ID == id);
+            var typePolyline = await _typePolylineService.Get(id);
             if (typePolyline == null)
             {
                 return NotFound();
@@ -49,12 +49,13 @@ namespace GIS_Technolory.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,Name,MapName,Icon,ColorLine,WeightLine")] TypePolyline typePolyline)
+        public async Task<IActionResult> Create([Bind("Name,MapName,Icon,ColorLine,WeightLine")] TypePolyline typePolyline)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(typePolyline);
-                await _context.SaveChangesAsync();
+                typePolyline.ID = Guid.NewGuid().ToString();
+                typePolyline.MapName = Extendsions.CreateRandomLayerName(8);
+                await _typePolylineService.Create(typePolyline);
                 return RedirectToAction(nameof(Index));
             }
             return View(typePolyline);
@@ -63,12 +64,12 @@ namespace GIS_Technolory.Controllers
         // GET: TypePolylines/Edit/5
         public async Task<IActionResult> Edit(string id)
         {
-            if (id == null || _context.TypePolylines == null)
+            if (id == null || _typePolylineService == null)
             {
                 return NotFound();
             }
 
-            var typePolyline = await _context.TypePolylines.FindAsync(id);
+            var typePolyline = await _typePolylineService.Get(id);
             if (typePolyline == null)
             {
                 return NotFound();
@@ -92,8 +93,7 @@ namespace GIS_Technolory.Controllers
             {
                 try
                 {
-                    _context.Update(typePolyline);
-                    await _context.SaveChangesAsync();
+                    await _typePolylineService.Update(typePolyline);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -114,13 +114,12 @@ namespace GIS_Technolory.Controllers
         // GET: TypePolylines/Delete/5
         public async Task<IActionResult> Delete(string id)
         {
-            if (id == null || _context.TypePolylines == null)
+            if (id == null || _typePolylineService == null)
             {
                 return NotFound();
             }
 
-            var typePolyline = await _context.TypePolylines
-                .FirstOrDefaultAsync(m => m.ID == id);
+            var typePolyline = await _typePolylineService.Get(id);
             if (typePolyline == null)
             {
                 return NotFound();
@@ -134,23 +133,19 @@ namespace GIS_Technolory.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            if (_context.TypePolylines == null)
+            var typePolyline = await _typePolylineService.Get(id);
+            if (typePolyline == null)
             {
-                return Problem("Entity set 'GISContext.TypePolylines'  is null.");
-            }
-            var typePolyline = await _context.TypePolylines.FindAsync(id);
-            if (typePolyline != null)
-            {
-                _context.TypePolylines.Remove(typePolyline);
+                return Problem("Entity get model is null");
             }
             
-            await _context.SaveChangesAsync();
+            await _typePolylineService.Delete(id);
             return RedirectToAction(nameof(Index));
         }
 
         private bool TypePolylineExists(string id)
         {
-          return _context.TypePolylines.Any(e => e.ID == id);
+            return _typePolylineService.Get(id).Result != null;
         }
     }
 }
