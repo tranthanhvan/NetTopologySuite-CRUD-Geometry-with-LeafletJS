@@ -27,5 +27,16 @@ function UpdateIcon() {
             }
         }
     );
-
 }
+
+
+$(document).ready(function () {
+    $('#click').click(function () {
+        $("#panel").animate({ width: 'toggle' }, 500);
+        if ($('#click').hasClass('to-left')) {
+            $('#click').removeClass('to-left').addClass('to-right');
+        } else {
+            $('#click').removeClass('to-right').addClass('to-left');
+        }
+    });
+});

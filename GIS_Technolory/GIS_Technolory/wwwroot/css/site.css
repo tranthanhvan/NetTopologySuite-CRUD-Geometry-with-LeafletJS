@@ -17,3 +17,120 @@ body {
   margin-bottom: 60px;
 }
 
+
+#click {
+    height: 32px;
+    width: 40px;
+    float: right;
+    border: 5px;
+    border-radius: 25px;
+    box-sizing: content-box;
+    margin-top:10px;
+}
+
+.item-suggestions {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+    .item-suggestions:hover {
+        background-color: #6E6E6E
+    }
+
+.to-left {
+    background-position-x: center;
+}
+
+.to-right {
+    background-position-x: center;
+}
+
+.css_tab_a {
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    display: block;
+}
+
+#panel {
+    height: 100%;
+    width: 400px;
+    background: #071914;
+    float: right;
+    display: none;
+    color: black;
+    opacity: 0.8;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+.leaflet-container {
+    z-index: 0;
+}
+
+.row_padding {
+    padding: 8px;
+}
+
+
+.custom-search {
+    position: relative;
+    width: 80%;
+    margin: 0 auto;
+}
+
+.custom-search-input {
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 100px;
+    padding: 10px 100px 10px 20px;
+    line-height: 1;
+    box-sizing: border-box;
+    outline: none;
+}
+
+.custom-search-botton {
+    position: absolute;
+    right: 3px;
+    top: 3px;
+    bottom: 3px;
+    border: 0;
+    background: #000000;
+    color: #fff;
+    outline: none;
+    margin: 0;
+    padding: 0 10px;
+    border-radius: 100px;
+    z-index: 2;
+}
+
+.custom-search-botton:hover {
+    opacity: 0.5;
+}
+
+.leaflet-control-layers-list label {
+    text-align:left;
+}
+
+.loading-bar {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('/Icon/loading.gif');
+    background-position: 50% 50%;
+    background-color: rgba(255,255,255,0.8);
+    background-repeat: no-repeat;
+}
+
+body.loading {
+    overflow: hidden;
+}
+
+body.loading .loading-bar {
+    display: block;
+}

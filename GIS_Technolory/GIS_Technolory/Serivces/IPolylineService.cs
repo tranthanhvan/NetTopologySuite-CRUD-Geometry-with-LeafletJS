@@ -1,6 +1,7 @@
 ﻿using GIS_Technolory.Entities;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore;
+using System.Security.AccessControl;
 
 namespace GIS_Technolory.Serivces
 {
@@ -24,7 +25,11 @@ namespace GIS_Technolory.Serivces
             string typeName = string.Empty;
             typeName = _Context.TypePolylines.FirstOrDefault(x => x.ID.Equals(uploadRecord.TypeID)).Name;
             uploadRecord.PopupContent = "<b>Name : " + uploadRecord.Name + "</b><br>"
-                                      + "<b>Type : " + typeName + "</b><br>";
+                                      + "<b>Type : " + typeName + "</b><br>"
+                                      + "<hr/>"
+                                      + "<center><button id='btnedit' value='' onclick='EditCabline(\"" + uploadRecord.ID + "\")' class='btn btn-default'>Edit</button>&nbsp;&nbsp;&nbsp;"
+                                      + "<button id='btndelete' value='' onclick='DeleteCabLine(\"" + uploadRecord.ID + "\")' class='btn btn-default'>Delete</button></center>";
+
 
             EntityEntry<Polyline> record = await _Context.AddAsync(uploadRecord);
             int result = await _Context.SaveChangesAsync();
@@ -68,7 +73,10 @@ namespace GIS_Technolory.Serivces
             string typeName = string.Empty;
             typeName = _Context.TypePolylines.FirstOrDefault(x => x.ID.Equals(uploadRecord.TypeID)).Name;
             uploadRecord.PopupContent = "<b>Name : " + uploadRecord.Name + "</b><br>"
-                                      + "<b>Type : " + typeName + "</b><br>";
+                                      + "<b>Type : " + typeName + "</b><br>"
+                                      + "<hr/>"
+                                      + "<center><button id='btnedit' value='' onclick='EditCabline(\"" + uploadRecord.ID + "\")' class='btn btn-default'>Edit</button>&nbsp;&nbsp;&nbsp;"
+                                      + "<button id='btndelete' value='' onclick='DeleteCabLine(\"" + uploadRecord.ID + "\")' class='btn btn-default'>Delete</button></center>";
 
             EntityEntry<Polyline> record = _Context.Update(uploadRecord);
             int result = await _Context.SaveChangesAsync();

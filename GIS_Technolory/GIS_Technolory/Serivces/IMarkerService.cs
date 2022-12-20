@@ -1,6 +1,8 @@
 ﻿using GIS_Technolory.Entities;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore;
+using Azure.Core;
+using System.Security.AccessControl;
 
 namespace GIS_Technolory.Serivces
 {
@@ -25,8 +27,10 @@ namespace GIS_Technolory.Serivces
             typeName = _Context.TypeMarkers.FirstOrDefault(x => x.ID.Equals(uploadRecord.TypeID)).Name;
             uploadRecord.PopupContent = "<b>Name : " + uploadRecord.Name + "</b><br>"
                                       + "<b>Type : " + typeName + "</b><br>"
-                                      + "<b>Latitude : " + uploadRecord.Lat + ", Longitude : " + uploadRecord.Long + "</b></br>";
-
+                                      + "<b>Latitude : " + uploadRecord.Lat + ", Longitude : " + uploadRecord.Long + "</b></br>"
+                                      + "<hr/>"
+                                      + "<center><button id='btnedit' value='" + uploadRecord.Lat + "," + uploadRecord.Long + "' onclick='EditFromMap(\"" + uploadRecord.ID + "\")' class='btn btn-default'>Edit</button>&nbsp;&nbsp;&nbsp;"
+                                      + "<button id='btndelete' value='" + uploadRecord.Lat + "," + uploadRecord.Long + "' onclick='Delete(\"" + uploadRecord.ID + "\")' class='btn btn-default'>Delete</button></center>";
             EntityEntry<Marker> record = await _Context.AddAsync(uploadRecord);
             int result = await _Context.SaveChangesAsync();
             if (result == 1)
@@ -70,7 +74,10 @@ namespace GIS_Technolory.Serivces
             typeName = _Context.TypeMarkers.FirstOrDefault(x => x.ID.Equals(uploadRecord.TypeID)).Name;
             uploadRecord.PopupContent = "<b>Name : " + uploadRecord.Name + "</b><br>"
                                       + "<b>Type : " + typeName + "</b><br>"
-                                      + "<b>Latitude : " + uploadRecord.Lat + ", Longitude : " + uploadRecord.Long + "</b></br>";
+                                      + "<b>Latitude : " + uploadRecord.Lat + ", Longitude : " + uploadRecord.Long + "</b></br>"
+                                      + "<hr/>"
+                                      + "<center><button id='btnedit' value='" + uploadRecord.Lat + "," + uploadRecord.Long + "' onclick='EditFromMap(\"" + uploadRecord.ID + "\")' class='btn btn-default'>Edit</button>&nbsp;&nbsp;&nbsp;"
+                                      + "<button id='btndelete' value='" + uploadRecord.Lat + "," + uploadRecord.Long + "' onclick='Delete(\"" + uploadRecord.ID + "\")' class='btn btn-default'>Delete</button></center>";
 
             EntityEntry<Marker> record = _Context.Update(uploadRecord);
             int result = await _Context.SaveChangesAsync();

@@ -2,25 +2,201 @@
     ViewData["Title"] = "Home Page";
 }
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
-      integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
-      crossorigin="" />
+<script src="~/js/leaflet/leaflet-src.js"></script>
+<link href="~/css/leaflet.css" rel="stylesheet" />
+<script src="~/js/geocoder/control.geocoder.js"></script>
+<link href="~/js/geocoder/control.geocoder.css" rel="stylesheet" />
 
-<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
-        integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
-        crossorigin=""></script>
 
-<div class="text-center">
-    <div id="map" style="height: 570px;"></div>
+
+<script src="~/js/drawing/js/Leaflet.draw.js"></script>
+
+<script src="~/js/drawing/js/Leaflet.Draw.Event.js"></script>
+<link rel="stylesheet" href="~/js/drawing/css/leaflet.draw.css">
+
+<script src="~/js/drawing/js/LayersEventHandling.js"></script>
+
+<script src="~/js/drawing/js/Toolbar.js"></script>
+<script src="~/js/drawing/js/Tooltip.js"></script>
+
+<script src="~/js/drawing/js/GeometryUtil.js"></script>
+<script src="~/js/drawing/js/LatLngUtil.js"></script>
+<script src="~/js/drawing/js/LineUtil.Intersect.js"></script>
+<script src="~/js/drawing/js/Polygon.Intersect.js"></script>
+<script src="~/js/drawing/js/Polyline.Intersect.js"></script>
+<script src="~/js/drawing/js/TouchEvents.js"></script>
+
+<script src="~/js/drawing/js/DrawToolbar.js"></script>
+<script src="~/js/drawing/js/Draw.Feature.js"></script>
+<script src="~/js/drawing/js/Draw.SimpleShape.js"></script>
+<script src="~/js/drawing/js/Draw.Polyline.js"></script>
+<script src="~/js/drawing/js/Draw.Marker.js"></script>
+<script src="~/js/drawing/js/Draw.ViceMarker.js"></script>
+<script src="~/js/drawing/js/Draw.Circle.js"></script>
+<script src="~/js/drawing/js/Draw.CircleMarker.js"></script>
+<script src="~/js/drawing/js/Draw.Polygon.js"></script>
+<script src="~/js/drawing/js/Draw.Rectangle.js"></script>
+
+
+<script src="~/js/drawing/js/EditToolbar.js"></script>
+<script src="~/js/drawing/js/EditToolbar.Edit.js"></script>
+<script src="~/js/drawing/js/EditToolbar.Delete.js"></script>
+
+<script src="~/js/drawing/js/Control.Draw.js"></script>
+
+<script src="~/js/drawing/js/Edit.Poly.js"></script>
+<script src="~/js/drawing/js/Edit.SimpleShape.js"></script>
+<script src="~/js/drawing/js/Edit.Rectangle.js"></script>
+<script src="~/js/drawing/js/Edit.Marker.js"></script>
+<script src="~/js/drawing/js/Edit.ViceMarker.js"></script>
+<script src="~/js/drawing/js/Edit.CircleMarker.js"></script>
+<script src="~/js/drawing/js/Edit.Circle.js"></script>
+
+
+
+<link href="~/js/hightlight/leaflet.marker.highlight.css" rel="stylesheet" />
+<script src="~/js/hightlight/leaflet.marker.highlight.js"></script>
+
+<div class="text-center" style="height: 570px; position:relative">
+    <div id="GISMap" style="height: 570px;" class="leaflet-container leaflet-touch leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom">
+
+    </div>
+    <div style="position:absolute; right:0px; top:0px; height:100%;max-height: inherit;">
+        <div id="panel">
+            <div style="margin-top : 60px;">
+                <div class="row">
+                    <hr />
+                    <center><b><span style="color : white">SEARCH TOOL</span></b></center>
+                    <div class="col-12" style="margin-top : 15px;">
+                        <div class="custom-search">
+                            <input type="text" class="custom-search-input" placeholder="Enter Name">
+                            <button class="custom-search-botton">Search</button>
+                        </div>
+                    </div>
+                </div>
+
+                <hr />
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="col-md-1">
+                        </div>
+                        <div class="col-md-10" id="resultSearch">
+                        </div>
+                        <div class="col-md-1">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div id='click' class="to-left">
+            <img src="/Icon/icons8-search-30.png" style="margin-left : 5px" />
+        </div>
+    </div>
+    <div class="loading-bar"></div>
 </div>
 
 <script type="text/javascript">
-    debugger;
-    var map = L.map('map').setView([51.505, -0.09], 13);
 
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    }).addTo(map);
+    var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
 
+        osmAttrib = 'Bạn đang sử dụng <a href="http://openstreetmap.org/copyright">&copy; OpenStreet Map</a>',
+        googleAttrib = 'Bạn đang sử dụng <a href="https://www.google.com/maps/">&copy; Google Map</a>',
+
+        osm = L.tileLayer(osmUrl, {
+            maxZoom: 17,
+            minZoom: 10,
+            attribution: osmAttrib
+        });
+
+    mapWord = L.tileLayer('https://api.maptiler.com/maps/streets/256/{z}/{x}/{y}.png?key=tE8RgRCdEojZFnaUYLB7', {
+        attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>',
+        minZoom: 5
+    });
+
+    googleStreets = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+        maxZoom: 17,
+        minZoom: 10,
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+        attribution: googleAttrib
+    });
+
+    //gmapGlobal = L.tileLayer('http://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}', { maxZoom: 20, attribution: googleAttrib }),
+    // 'HTml element'
+    map = new L.Map('GISMap', { center: new L.LatLng(21.028511, 105.804817), zoom: 14 });
+
+    L.control.scale().addTo(map);
+
+    var geocoder = L.Control.geocoder({
+        defaultMarkGeocode: false
+    }).on('markgeocode', function (e) {
+        var bbox = e.geocode.bbox;
+        console.log(bbox);
+        var poly = L.polygon([
+            bbox.getSouthEast(),
+            bbox.getNorthEast(),
+            bbox.getNorthWest(),
+            bbox.getSouthWest(),
+        ]).addTo(map);
+
+        //var middleLatlngs = poly.getBounds().getCenter();
+        //map.flyTo(new L.LatLng(middleLatlngs.lat, middleLatlngs.lng));
+        map.fitBounds(poly.getBounds());
+
+        setTimeout(function () {
+            map.removeLayer(poly);
+        }, 5000);
+    })
+        .addTo(map);
+
+
+    window.onload = function () {
+        $.ajax({
+            type: "GET",
+            beforeSend: function () {
+                $(".loading-bar").show();
+            },
+            complete: function () {
+                $(".loading-bar").hide();
+            },
+            url: "/Geo/GetGeoData",
+            success: function (response) {
+                var $response = response;
+                if ($response.Success == true) {
+                    debugger;
+                    let Types = $response.Data.TypeMaps;
+
+                    let paramsJson = {
+
+                    };
+                    for (var i = 0; i < Types.length; i++) {
+                        //create variable with regist featuremap
+                        paramsJson[Types[i].Name] = window[Types[i].MapName] = L.featureGroup().addTo(map);
+                    }
+
+                    L.control.layers({
+                        "OpenStreet Map": osm.addTo(map),
+                        "Google Map": googleStreets,
+                        "The free size map": mapWord
+                    }, paramsJson, { position: 'topleft', collapsed: false }).addTo(map);
+
+                    map.addControl(new L.Control.Draw({
+                        draw: {
+                            polyline: {
+                                shapeOptions: {
+                                    color: '#04B431',
+                                    weight: 7,
+                                }
+                            }
+                        }
+                    }));
+
+                }
+                else {
+                    alert('error when get geotdata');
+                }
+            }
+        });
+    }
 </script>
