@@ -35,8 +35,7 @@ namespace GIS_Technolory.Controllers
                     LatLongs = uploadRecord.LatLongs.Select(x=> new PolylineLatLong()
                     {
                         ID = Guid.NewGuid().ToString(),
-                        Longitude = x.Longitude,
-                        Latitude = x.Latitude,
+                        Location = new NetTopologySuite.Geometries.Point(x.Longitude, x.Latitude) { SRID = 4326 },
                         Order = x.Order,
                         PolylineID = id
                     }).ToList()
@@ -82,12 +81,13 @@ namespace GIS_Technolory.Controllers
         }
 
 
-        public async Task<IActionResult> GetPolyline(string id)
+        [HttpPost]
+        public async Task<IActionResult> GetPolyline([FromBody] PolylineModel input)
         {
             var response = new Response<string>();
             try
             {
-                var polyline = await _polylineService.Get(id);
+                var polyline = await _polylineService.Get(input.ID);
                 var typePolinies = await _typePolylineService.GetList();
 
                 PolylineFormModel modelResult;
@@ -97,7 +97,15 @@ namespace GIS_Technolory.Controllers
                     {
                         Polyline = new PolylineModel()
                         {
-                            LatLongs = new List<PolylineLatLongModel>()
+                            CablineLength = input.CablineLength,
+                            CentralLatlng = input.CentralLatlng,
+                            LatLongs = input.LatLongs.Select(x => new PolylineLatLongModel()
+                            {
+                                ID = string.Empty,
+                                Latitude = x.Latitude,
+                                Longitude = x.Longitude,
+                                Order = x.Order
+                            }).ToList()
                         },
                         Types = typePolinies.Select(x => new TypeModel()
                         {

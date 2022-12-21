@@ -27,10 +27,10 @@ namespace GIS_Technolory.Serivces
             typeName = _Context.TypeMarkers.FirstOrDefault(x => x.ID.Equals(uploadRecord.TypeID)).Name;
             uploadRecord.PopupContent = "<b>Name : " + uploadRecord.Name + "</b><br>"
                                       + "<b>Type : " + typeName + "</b><br>"
-                                      + "<b>Latitude : " + uploadRecord.Lat + ", Longitude : " + uploadRecord.Long + "</b></br>"
-                                      + "<hr/>"
-                                      + "<center><button id='btnedit' value='" + uploadRecord.Lat + "," + uploadRecord.Long + "' onclick='EditFromMap(\"" + uploadRecord.ID + "\")' class='btn btn-default'>Edit</button>&nbsp;&nbsp;&nbsp;"
-                                      + "<button id='btndelete' value='" + uploadRecord.Lat + "," + uploadRecord.Long + "' onclick='Delete(\"" + uploadRecord.ID + "\")' class='btn btn-default'>Delete</button></center>";
+                                      + "<b>Latitude : " + uploadRecord.Latitude + "</b></br>"
+                                      + "<b>Longitude : " + uploadRecord.Longitude + "</b></br>"
+                                      + "<div class='swal2-actions'><button id='btnedit' value='" + uploadRecord.Latitude + "," + uploadRecord.Longitude + "' onclick='EditFromMap(\"" + uploadRecord.ID + "\")' class='swal2-confirm swal2-styled'>Edit</button>&nbsp;&nbsp;&nbsp;"
+                                      + "<button id='btndelete' value='" + uploadRecord.Latitude + "," + uploadRecord.Longitude + "' onclick='Delete(\"" + uploadRecord.ID + "\")' class='swal2-deny swal2-styled'>Delete</button></div>";
             EntityEntry<Marker> record = await _Context.AddAsync(uploadRecord);
             int result = await _Context.SaveChangesAsync();
             if (result == 1)
@@ -54,13 +54,13 @@ namespace GIS_Technolory.Serivces
 
         public async Task<Marker> Get(string id)
         {
-            return await _Context.Markers.FirstOrDefaultAsync(x => x.ID.Equals(id));
+            return await _Context.Markers.Include(x=>x.Type).FirstOrDefaultAsync(x => x.ID.Equals(id));
         }
 
         public async Task<IEnumerable<Marker>> GetList(string name = null)
         {
             if(string.IsNullOrEmpty(name))
-                return await _Context.Markers.ToListAsync();
+                return await _Context.Markers.Include(x => x.Type).ToListAsync();
             else
             {
                 string search = name.Trim().ToLower();
@@ -74,10 +74,10 @@ namespace GIS_Technolory.Serivces
             typeName = _Context.TypeMarkers.FirstOrDefault(x => x.ID.Equals(uploadRecord.TypeID)).Name;
             uploadRecord.PopupContent = "<b>Name : " + uploadRecord.Name + "</b><br>"
                                       + "<b>Type : " + typeName + "</b><br>"
-                                      + "<b>Latitude : " + uploadRecord.Lat + ", Longitude : " + uploadRecord.Long + "</b></br>"
-                                      + "<hr/>"
-                                      + "<center><button id='btnedit' value='" + uploadRecord.Lat + "," + uploadRecord.Long + "' onclick='EditFromMap(\"" + uploadRecord.ID + "\")' class='btn btn-default'>Edit</button>&nbsp;&nbsp;&nbsp;"
-                                      + "<button id='btndelete' value='" + uploadRecord.Lat + "," + uploadRecord.Long + "' onclick='Delete(\"" + uploadRecord.ID + "\")' class='btn btn-default'>Delete</button></center>";
+                                      + "<b>Latitude : " + uploadRecord.Latitude + "</b></br>"
+                                      + "<b>Longitude : " + uploadRecord.Longitude + "</b></br>"
+                                      + "<div class='swal2-actions'><button id='btnedit' value='" + uploadRecord.Latitude + "," + uploadRecord.Longitude + "' onclick='EditFromMap(\"" + uploadRecord.ID + "\")' class='swal2-confirm swal2-styled'>Edit</button>&nbsp;&nbsp;&nbsp;"
+                                      + "<button id='btndelete' value='" + uploadRecord.Latitude + "," + uploadRecord.Longitude + "' onclick='Delete(\"" + uploadRecord.ID + "\")' class='swal2-deny swal2-styled'>Delete</button></div>";
 
             EntityEntry<Marker> record = _Context.Update(uploadRecord);
             int result = await _Context.SaveChangesAsync();

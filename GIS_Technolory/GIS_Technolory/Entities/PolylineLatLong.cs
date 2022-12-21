@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using NetTopologySuite.Geometries;
 
 namespace GIS_Technolory.Entities
 {
@@ -8,12 +9,14 @@ namespace GIS_Technolory.Entities
         [Key]
         [MaxLength(50)]
         public string ID { get; set; }
+        [NotMapped]
+        public double Latitude { get => Location.Y; }
+        [NotMapped]
+        public double Longitude { get => Location.X; }
+
         [Required]
-        [Column(TypeName = "decimal(18, 0)")]
-        public decimal Latitude { get; set; }
-        [Required]
-        [Column(TypeName = "decimal(18, 0)")]
-        public decimal Longitude { get; set; }
+        public Point Location { get; set; }
+
         public int Order { get; set; }
 
         [Required]

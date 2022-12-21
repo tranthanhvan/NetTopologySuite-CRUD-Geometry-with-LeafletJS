@@ -24,14 +24,14 @@ namespace GIS_Technolory.Controllers
             var response = new Response<Marker>();
             try
             {
-                response.Data = await _markerService.Create(new Marker()
+                Marker create = await _markerService.Create(new Marker()
                 {
                     ID = Guid.NewGuid().ToString(),
                     Name = uploadRecord.Name,
-                    Long = uploadRecord.Long,
-                    Lat = uploadRecord.Lat,
+                    Location = new NetTopologySuite.Geometries.Point(uploadRecord.Long, uploadRecord.Lat) { SRID = 4326 },
                     TypeID = uploadRecord.TypeID
                 });
+                response.Data = await _markerService.Get(create.ID);
                 response.Success = response.Data != null;
                 response.Message = "Create marker is successful";
             }
@@ -47,10 +47,11 @@ namespace GIS_Technolory.Controllers
         [HttpPost]
         public async Task<IActionResult> Update([FromBody] MarkerModel uploadRecord)
         {
-            var response = new Response<Marker>();
+            var response = new Response<object>();
             try
             {
                 Marker marker = await _markerService.Get(uploadRecord.ID);
+                
                 if(marker is null)
                 {
                     response.Success = false;
@@ -58,12 +59,47 @@ namespace GIS_Technolory.Controllers
                 }
                 else
                 {
+                    string oldMapName = marker.Type.MapName;
                     marker.Name = uploadRecord?.Name;
                     marker.TypeID = uploadRecord.TypeID;
-                    response.Data = await _markerService.Update(marker);
+                    await _markerService.Update(marker);
+                    var markerNew = await _markerService.Get(marker.ID);
+                    response.Data = new
+                    {
+                        Marker = markerNew,
+                        OldMap = oldMapName
+                    };
                     response.Success = response.Data != null;
                     response.Message = "Update marker is successful";
                 }
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message + ex.InnerException;
+            }
+            return Ok(response);
+        }
+
+
+        public async Task<IActionResult> DeleteMarker(string id)
+        {
+            var response = new Response<Marker>();
+            try
+            {
+                var marker = await _markerService.Get(id);
+                if(marker is null)
+                {
+                    response.Success = false;
+                    response.Message = "Marker is not found in databases";
+                }
+                else
+                {
+                    response.Data = marker;
+                    response.Success = await _markerService.Delete(id);
+                    response.Message = "Delete marker is successful";
+                }
+                
             }
             catch (Exception ex)
             {
@@ -108,8 +144,8 @@ namespace GIS_Technolory.Controllers
                         Marker = new MarkerModel()
                         {
                             ID = marker.ID,
-                            Lat = marker.Lat,
-                            Long = marker.Long,
+                            Lat = marker.Latitude,
+                            Long = marker.Longitude,
                             Name = marker.Name,
                             TypeID = marker.TypeID
                         },

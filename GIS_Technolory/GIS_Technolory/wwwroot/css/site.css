@@ -138,3 +138,8 @@ body.loading .loading-bar {
 .padding-form {
     padding-top: 20px;
 }
+
+.error {
+    color: red;
+    font-size: 13px;
+}

@@ -1,4 +1,5 @@
 ﻿using GIS_Technolory.Entities;
+using GIS_Technolory.Models;
 using GIS_Technolory.Response;
 using GIS_Technolory.Serivces;
 using Microsoft.AspNetCore.Mvc;
@@ -47,7 +48,16 @@ namespace GIS_Technolory.Controllers
                 response.Success = true;
                 response.Data = new
                 {
-                    TypeMaps = typeSelect
+                    TypeMaps = typeSelect,
+                    Markers = markers.Select(x => new MarkerModel() {
+                        ID = x.ID,
+                        Name = x.Name,
+                        Long = x.Longitude,
+                        Lat = x.Latitude,
+                        PopupContent = x.PopupContent,
+                        MapName = x.Type.MapName,
+                        IconType= x.Type.Icon
+                    })
                 };
             }
             catch (Exception ex)

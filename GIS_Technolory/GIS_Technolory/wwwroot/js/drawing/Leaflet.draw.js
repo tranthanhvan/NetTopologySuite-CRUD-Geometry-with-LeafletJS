@@ -47,6 +47,10 @@ L.drawVersion = '0.4.2';
  * FeatureCollection of non-multigeometries (Points, LineStrings, or Polygons).
  */
 L.Draw = {};
+L.Draw.constants = {
+	iconSize: 40,
+	anchorSize: 10
+}
 
 /**
  * @class L.drawLocal

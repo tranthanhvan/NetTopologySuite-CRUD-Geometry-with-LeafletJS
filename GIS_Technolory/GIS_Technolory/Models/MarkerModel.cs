@@ -6,12 +6,16 @@
 
         public string Name { get; set; }
 
-        public decimal Long { get; set; }
+        public double Long { get; set; }
 
-        public decimal Lat { get; set; }
+        public double Lat { get; set; }
 
         public string PopupContent { get; set; }
 
         public string TypeID { get; set; }
+        public string TypeName { get; set; }
+        public string MapName { get; set; }
+
+        public string IconType { get; set; }
     }
 }

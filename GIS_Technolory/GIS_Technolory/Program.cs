@@ -9,8 +9,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 ConnectionService.Set(builder.Configuration);
-builder.Services.AddDbContext<GISContext>(options => options.UseSqlServer(ConnectionService.connstring)
-.LogTo(Console.WriteLine, LogLevel.Information));
+builder.Services.AddDbContext<GISContext>(options => options.UseSqlServer(ConnectionService.connstring, sqlOption =>
+            sqlOption.UseNetTopologySuite()
+         ));
 
 builder.Services.AddTransient<ITypeMarkerService, TypeMarkerService>();
 builder.Services.AddTransient<ITypePolylineService, TypePolylineService>();

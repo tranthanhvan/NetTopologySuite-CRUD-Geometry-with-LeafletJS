@@ -21,6 +21,6 @@ namespace GIS_Technolory.DBAccess
         public DbSet<TypePolyline> TypePolylines { get; set; }
         public DbSet<PolylineLatLong> PolylineLatLongs { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder options) => options.UseSqlServer(ConnectionService.connstring);
+        protected override void OnConfiguring(DbContextOptionsBuilder options) => options.UseSqlServer(ConnectionService.connstring, x => x.UseNetTopologySuite()).LogTo(Console.WriteLine, LogLevel.Information);
     }
 }

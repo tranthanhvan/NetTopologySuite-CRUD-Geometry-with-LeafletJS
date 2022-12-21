@@ -1,7 +1,7 @@
 ﻿@model MarkerFormModel;
 
 
-<form id="form-marker-input">
+<form id="form-marker-input" name="form-marker-input">
     <input type="text" id="form-marker-input-id" maxlength="250" class="form-control" value="@Model.Marker.ID" hidden/>
     <div class="row padding-form">
         <div class="col-md-4">
@@ -12,9 +12,16 @@
                 @{
                     foreach (var item in @Model.Types)
                     {
-                        <option value="@item.Value" data-image="@item.ImageUrl">
-                            @item.Text
-                        </option>
+                        if(item.Value == Model.Marker.TypeID) {
+                            <option value="@item.Value" data-image="@item.ImageUrl" selected>
+                                @item.Text
+                            </option>
+                        }
+                        else {
+                            <option value="@item.Value" data-image="@item.ImageUrl">
+                                @item.Text
+                            </option>
+                        }
                     }
                 }
             </select>
@@ -25,7 +32,7 @@
             <label>Name marker :</label>
         </div>
         <div class="col-md-8">
-            <input type="text" id="form-marker-input-name" maxlength="250" class="form-control" value="@Model.Marker.Name" />
+            <input type="text" id="form-marker-input-name" name="form-marker-input-name" maxlength="250" class="form-control" value="@Model.Marker.Name" />
         </div>
     </div>
 
@@ -34,7 +41,7 @@
             <label>Lat :</label>
         </div>
         <div class="col-md-8">
-            <input type="text" id="form-marker-input-lat" maxlength="50" class="form-control" value="@Model.Marker.Lat" readonly/>
+            <input type="text" id="form-marker-input-lat" name="form-marker-input-lat" maxlength="50" class="form-control" value="@Model.Marker.Lat" readonly />
         </div>
     </div>
 
@@ -43,7 +50,7 @@
             <label>Long :</label>
         </div>
         <div class="col-md-8">
-            <input type="text" id="form-marker-input-long" maxlength="50" class="form-control" value="@Model.Marker.Long" readonly />
+            <input type="text" id="form-marker-input-long" name="form-marker-input-long" maxlength="50" class="form-control" value="@Model.Marker.Long" readonly />
         </div>
     </div>
     
