@@ -89,6 +89,42 @@
     <div class="loading-bar"></div>
 </div>
 
+<div class="modal fade" id="modal-marker" tabindex="-1" style="margin-top: 5%" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Marker detail</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="container-modal-body-marker">
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary">Save changes</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal-polyline" tabindex="-1" style="margin-top: 5%" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Marker detail</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="container-modal-body-polyline">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary">Save changes</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script type="text/javascript">
 
     var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -139,9 +175,139 @@
         setTimeout(function () {
             map.removeLayer(poly);
         }, 5000);
-    })
-        .addTo(map);
+    }).addTo(map);
 
+
+    function GetMarker(id , lat, long) {
+        if(id == null) {
+            id = '';
+        }
+
+        let raw = {
+            ID : id,
+            Lat : lat,
+            Long : long
+        };
+
+        $.ajax({
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $(".loading-bar").show();
+            },
+            complete: function () {
+                $(".loading-bar").hide();
+            },
+            url: "/Marker/GetMarker",
+            data: JSON.stringify(raw),
+            success: function (response) {
+                var $response = response;
+                if ($response.Success == true) {
+
+                    $("#container-modal-body-marker").html("");
+                    $("#container-modal-body-marker").html($response.Data);
+
+                    $("#form-marker-input-typemarker").msDropdown({ roundedBorder: false });
+
+                    let modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-marker')) // Returns a Bootstrap modal instance
+                    // Show or hide:
+                    modal.show();
+                }
+                else {
+                    alert('error when get geotdata');
+                }
+            }
+        });
+    }
+
+    function GetPolyline(id, arrLatLngs, length , central) {
+        if (id == null) {
+            id = '';
+        }
+
+        $.ajax({
+            type: "GET",
+            beforeSend: function () {
+                $(".loading-bar").show();
+            },
+            complete: function () {
+                $(".loading-bar").hide();
+            },
+            url: "/Polyline/GetPolyline",
+            data: {
+                id: id
+            },
+            success: function (response) {
+                var $response = response;
+                if ($response.Success == true) {
+
+                    $("#container-modal-body-polyline").html("");
+                    $("#container-modal-body-polyline").html($response.Data);
+
+                    $("#form-polyline-input-type").msDropdown({ roundedBorder: false });
+
+                    let modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-polyline')) // Returns a Bootstrap modal instance
+                    // Show or hide:
+                    modal.show();
+                }
+                else {
+                    alert('error when get geotdata');
+                }
+            }
+        });
+    }
+
+    function getLayerType(layer) {
+        var layerType = "";
+
+        if (layer instanceof L.Marker) {
+            layerType = "Marker";
+        }
+        else if (layer instanceof L.Polyline) {
+            layerType = "Polyline";
+        }
+        return layerType;
+    };
+
+    function distance(latlngs) {
+        var tempLatLng = null;
+        var totalDistance = 0.00000;
+        var distanceStr;
+        $.each(latlngs, function (i, latlng) {
+            if (tempLatLng == null) {
+                tempLatLng = latlng;
+                return;
+            }
+            totalDistance += tempLatLng.distanceTo(latlng);
+            tempLatLng = latlng;
+        });
+
+        if (totalDistance > 1000) {
+            distanceStr = formattedNumber(totalDistance / 1000, 2) + ' km';
+        } else {
+            distanceStr = formattedNumber(totalDistance, 0) + ' m';
+        }
+
+        return distanceStr;
+    };
+
+
+    function formattedNumber(n, precision) {
+        var formatted = parseFloat(n).toFixed(precision),
+            format = L.drawLocal.format && L.drawLocal.format.numeric,
+            delimiters = format && format.delimiters,
+            thousands = delimiters && delimiters.thousands,
+            decimal = delimiters && delimiters.decimal;
+        if (thousands || decimal) {
+            var splitValue = formatted.split('.');
+            formatted = thousands ? splitValue[0].replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1' + thousands) : splitValue[0];
+            decimal = decimal || '.';
+            if (splitValue.length > 1) {
+                formatted = formatted + decimal + splitValue[1];
+            }
+        }
+        return formatted;
+    };
 
     window.onload = function () {
         $.ajax({
@@ -198,9 +364,41 @@
 
 
                     map.on(L.Draw.Event.CREATED, function (event) {
-                        var layer = event.layer;
+                        //drawnItems.addLayer(layer);
 
-                        drawnItems.addLayer(layer);
+                        debugger;
+                        var layer = event.layer,
+                            layerType = getLayerType(layer);
+
+                        if (layerType === 'Marker') {
+                            var data = {
+                                LatLngs: [layer._latlng]
+                            };
+
+                            GetMarker('', data.LatLngs[0].lat, data.LatLngs[0].lng);
+                        }
+                        else if (layerType === 'Polyline') {
+                            let centralLatlngs = layer.getBounds().getCenter().lat + ',' + layer.getBounds().getCenter().lng;
+
+                            CablineLatlngsCU = [];
+                            let order = 1;
+                            layer._latlngs.forEach(function (item) {
+                                let itemInject = {
+                                    Order: order,
+                                    lat: item.lat,
+                                    lng: item.lng
+                                };
+                                CablineLatlngsCU.push(itemInject);
+                                order++;
+                            });
+                            let lengthCabline = distance(layer._latlngs);
+                            
+                            GetPolyline('', CablineLatlngsCU, lengthCabline, centralLatlngs);
+                        }
+
+                        console.log('Created layer:', layer);
+                        console.log('Type: ', layerType);
+
                     });
 
                 }

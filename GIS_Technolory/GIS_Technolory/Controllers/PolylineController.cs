@@ -1,4 +1,5 @@
 ﻿using GIS_Technolory.Entities;
+using GIS_Technolory.Helpers;
 using GIS_Technolory.Models;
 using GIS_Technolory.Response;
 using GIS_Technolory.Serivces;
@@ -9,10 +10,12 @@ namespace GIS_Technolory.Controllers
     public class PolylineController : Controller
     {
         private readonly IPolylineService _polylineService;
+        private readonly ITypePolylineService _typePolylineService;
 
-        public PolylineController(IPolylineService polylineService)
+        public PolylineController(IPolylineService polylineService, ITypePolylineService typePolylineService)
         {
             _polylineService = polylineService;
+            _typePolylineService = typePolylineService;
         }
 
         [HttpPost]
@@ -69,6 +72,71 @@ namespace GIS_Technolory.Controllers
                     response.Success = response.Data != null;
                     response.Message = "Update Polyline is successful";
                 }
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message + ex.InnerException;
+            }
+            return Ok(response);
+        }
+
+
+        public async Task<IActionResult> GetPolyline(string id)
+        {
+            var response = new Response<string>();
+            try
+            {
+                var polyline = await _polylineService.Get(id);
+                var typePolinies = await _typePolylineService.GetList();
+
+                PolylineFormModel modelResult;
+                if (polyline is null)
+                {
+                    modelResult = new PolylineFormModel()
+                    {
+                        Polyline = new PolylineModel()
+                        {
+                            LatLongs = new List<PolylineLatLongModel>()
+                        },
+                        Types = typePolinies.Select(x => new TypeModel()
+                        {
+                            ImageUrl = x.Icon,
+                            Text = x.Name,
+                            Value = x.ID
+                        }).ToList()
+                    };
+                }
+                else
+                {
+                    modelResult = new PolylineFormModel()
+                    {
+                        Polyline = new PolylineModel()
+                        {
+                            ID = polyline.ID,
+                            Name = polyline.Name,
+                            TypeID = polyline.TypeID,
+                            CablineLength = polyline.CablineLength,
+                            CentralLatlng = polyline.CentralLatlng,
+                            LatLongs = polyline.LatLongs.Select(x=> new PolylineLatLongModel()
+                            {
+                                ID = x.ID,
+                                Latitude = x.Latitude,
+                                Longitude = x.Longitude,
+                                Order = x.Order
+                            }).ToList()
+                        },
+                        Types = typePolinies.Select(x => new TypeModel()
+                        {
+                            ImageUrl = x.Icon,
+                            Text = x.Name,
+                            Value = x.ID
+                        }).ToList()
+                    };
+                }
+
+                response.Data = await this.RenderViewAsync("_DetailPolyline", modelResult, true);
+                response.Success = !string.IsNullOrEmpty(response.Data);
             }
             catch (Exception ex)
             {

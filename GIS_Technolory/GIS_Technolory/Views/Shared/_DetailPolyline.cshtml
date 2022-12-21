@@ -1,0 +1,74 @@
+﻿@model PolylineFormModel;
+
+
+<form id="form-polyline-input">
+    <input type="text" id="form-polyline-input-id" maxlength="250" class="form-control" value="@Model.Polyline.ID" hidden />
+    <div class="row padding-form">
+        <div class="col-md-4">
+            <label>Type polyline :</label>
+        </div>
+        <div class="col-md-8">
+            <select name="form-polyline-input-type" id="form-polyline-input-type" style="width:100%;">
+                @{
+                    foreach (var item in @Model.Types)
+                    {
+                        <option value="@item.Value" data-image="@item.ImageUrl">
+                            @item.Text
+                        </option>
+                    }
+                }
+            </select>
+        </div>
+    </div>
+    <div class="row padding-form">
+        <div class="col-md-4">
+            <label>Name Polyline :</label>
+        </div>
+        <div class="col-md-8">
+            <input type="text" id="form-polyline-input-name" maxlength="250" class="form-control" value="@Model.Polyline.Name" />
+        </div>
+    </div>
+
+    <div class="row padding-form">
+        <div class="col-md-4">
+            <label>Length polyline  :</label>
+        </div>
+        <div class="col-md-8">
+            <input type="text" id="form-polyline-input-lat" maxlength="50" class="form-control" value="@Model.Polyline.CablineLength" readonly />
+        </div>
+    </div>
+
+    <div class="row padding-form">
+        <div class="col-md-4">
+            <label>Central latlngs :</label>
+        </div>
+        <div class="col-md-8">
+            <input type="text" id="form-polyline-input-long" maxlength="50" class="form-control" value="@Model.Polyline.CentralLatlng" readonly />
+        </div>
+    </div>
+
+    <div class="row padding-form">
+        <div class="col-md-12">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Long</th>
+                        <th scope="col">Lat</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in @Model.Polyline.LatLongs)
+                    {
+                        <tr>
+                            <th scope="row">@item.Order</th>
+                            <td>@item.Longitude</td>
+                            <td>@item.Latitude</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</form>

@@ -64,7 +64,7 @@ namespace GIS_Technolory.Serivces
             else
             {
                 string search = name.Trim().ToLower();
-                return await _Context.Polylines.Include(x => x.Type).Include(x=>x.LatLongs).Where(x => x.Name.Contains(search)).ToListAsync();
+                return await _Context.Polylines.Include(x => x.Type).Include(x=>x.LatLongs.OrderBy(x=>x.Order)).Where(x => x.Name.Contains(search)).ToListAsync();
             }
         }
 
