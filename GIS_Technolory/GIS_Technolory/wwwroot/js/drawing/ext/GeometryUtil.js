@@ -110,6 +110,7 @@
 			var distanceStr,
 				units,
 				precision = L.Util.extend({}, defaultPrecision, precision);
+
 			if (isMetric) {
 				units = typeof isMetric == 'string' ? isMetric : 'metric';
 			} else if (isFeet) {

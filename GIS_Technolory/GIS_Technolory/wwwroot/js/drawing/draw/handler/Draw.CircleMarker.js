@@ -11,7 +11,7 @@ L.Draw.CircleMarker = L.Draw.Marker.extend({
 	options: {
 		stroke: true,
 		color: '#3388ff',
-		weight: 2,
+		weight: 4,
 		opacity: 0.5,
 		fill: true,
 		fillColor: null, //same as color by default

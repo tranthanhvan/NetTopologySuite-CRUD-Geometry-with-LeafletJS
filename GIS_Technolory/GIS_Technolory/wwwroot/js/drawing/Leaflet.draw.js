@@ -47,10 +47,7 @@ L.drawVersion = '0.4.2';
  * FeatureCollection of non-multigeometries (Points, LineStrings, or Polygons).
  */
 L.Draw = {};
-L.Draw.constants = {
-	iconSize: 40,
-	anchorSize: 10
-}
+
 /**
  * @class L.drawLocal
  * @aka L.drawLocal
@@ -88,72 +85,66 @@ L.drawLocal = {
 			// #TODO: this should be reorganized where actions are nested in actions
 			// ex: actions.undo  or actions.cancel
 			actions: {
-				title: 'Cancel draw',
+				title: 'Cancel drawing',
 				text: 'Cancel'
 			},
 			finish: {
-				title: 'Finish draw',
+				title: 'Finish drawing',
 				text: 'Finish'
 			},
 			undo: {
-				title: 'Delete last draw object',
-				text: 'Delete object'
+				title: 'Delete last point drawn',
+				text: 'Delete last point'
 			},
 			buttons: {
-				polyline: 'Create Poliline',
-				polygon: 'Vẽ đa giác',
-				rectangle: 'Vẽ hình chữ nhật',
-				circle: 'Vẽ hình tròn',
-				marker: 'Create Marker',
-				vicemarker: 'Thêm điểm dịch vụ',
-				circlemarker: 'Thêm hố kỹ thuật'
+				polyline: 'Draw a polyline',
+				polygon: 'Draw a polygon',
+				rectangle: 'Draw a rectangle',
+				circle: 'Draw a circle',
+				marker: 'Draw a marker',
+				circlemarker: 'Draw a circlemarker'
 			}
 		},
 		handlers: {
 			circle: {
 				tooltip: {
-					start: 'Mouse and drag to draw.'
+					start: 'Click and drag to draw circle.'
 				},
 				radius: 'Radius'
 			},
 			circlemarker: {
 				tooltip: {
-					start: 'Select on the map to draw.'
+					start: 'Click map to place circle marker.'
 				}
 			},
 			marker: {
 				tooltip: {
-					start: 'Select a point on the map to place the station.'
-				}
-			},
-			vicemarker: {
-				tooltip: {
-					start: 'Chọn 1 điểm trên bản đồ để đặt trạm.'
+					start: 'Click map to place marker.'
 				}
 			},
 			polygon: {
 				tooltip: {
-					start: 'Nhấp chuột để bắt đầu vẽ.',
-					cont: 'Nhấp chuột để tiếp tục vẽ.',
-					end: 'Nhấp đúp chuột hoặc nhấp chọn điểm đầu tiên để kết thúc.'
+					start: 'Click to start drawing shape.',
+					cont: 'Click to continue drawing shape.',
+					end: 'Click first point to close this shape.'
 				}
 			},
 			polyline: {
-				error: '<strong>Lỗi:</strong> hình vẽ không hợp lệ!',
+				error: '<strong>Error:</strong> shape edges cannot cross!',
 				tooltip: {
-					start: 'Click to start drawing.',
-					cont: 'Click to continue drawing.',
-					end: 'Double click or click the last point to finish.'
+					start: 'Click to start drawing line.',
+					cont: 'Click to continue drawing line.',
+					end: 'Click last point to finish line.'
 				}
 			},
 			rectangle: {
 				tooltip: {
-					start: 'Nhấp - giữ chuột và kéo để vẽ hình.'
+					start: 'Click and drag to draw rectangle.'
 				}
 			},
 			simpleshape: {
 				tooltip: {
-					end: 'Thả chuột để kết thúc.'
+					end: 'Release mouse to finish drawing.'
 				}
 			}
 		}
@@ -162,35 +153,35 @@ L.drawLocal = {
 		toolbar: {
 			actions: {
 				save: {
-					title: 'Ghi lại những thay đổi',
-					text: 'Ghi lại'
+					title: 'Save changes',
+					text: 'Save'
 				},
 				cancel: {
-					title: 'Hủy bỏ những thay đổi',
-					text: 'Hủy ghi'
+					title: 'Cancel editing, discards all changes',
+					text: 'Cancel'
 				},
 				clearAll: {
-					title: 'Xóa tất cả các lớp',
-					text: 'Xóa tất cả'
+					title: 'Clear all layers',
+					text: 'Clear All'
 				}
 			},
 			buttons: {
-				edit: 'Chỉnh sửa',
-				editDisabled: 'Không có lớp thông tin cần chỉnh sửa',
-				remove: 'Xóa lớp',
-				removeDisabled: 'Không có lớp thông tin cần xóa'
+				edit: 'Edit layers',
+				editDisabled: 'No layers to edit',
+				remove: 'Delete layers',
+				removeDisabled: 'No layers to delete'
 			}
 		},
 		handlers: {
 			edit: {
 				tooltip: {
-					text: 'Kéo hoặc nhấp chọn để chỉnh sửa',
-					subtext: 'Chọn "Hủy" để hủy ghi.'
+					text: 'Drag handles or markers to edit features.',
+					subtext: 'Click cancel to undo changes.'
 				}
 			},
 			remove: {
 				tooltip: {
-					text: 'Nhấp chọn đối tượng để xóa'
+					text: 'Click on a feature to remove.'
 				}
 			}
 		}

@@ -151,7 +151,7 @@ L.EditToolbar.Edit = L.Handler.extend({
 					latlng: L.LatLngUtil.cloneLatLng(layer.getLatLng()),
 					radius: layer.getRadius()
 				};
-			} else if (layer instanceof L.Marker || layer instanceof L.ViceMarker || layer instanceof L.CircleMarker) { // Marker
+			} else if (layer instanceof L.Marker || layer instanceof L.CircleMarker) { // Marker
 				this._uneditedLayerProps[id] = {
 					latlng: L.LatLngUtil.cloneLatLng(layer.getLatLng())
 				};

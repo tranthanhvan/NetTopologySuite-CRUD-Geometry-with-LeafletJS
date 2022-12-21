@@ -10,10 +10,11 @@ L.DrawToolbar = L.Toolbar.extend({
 
 	options: {
 		polyline: {},
-		//polygon: {},
-		//rectangle: {},
-		//circle: {},
-		marker: {}
+		polygon: {},
+		rectangle: {},
+		circle: {},
+		marker: {},
+		circlemarker: {}
 	},
 
 	// @method initialize(): void
@@ -50,15 +51,20 @@ L.DrawToolbar = L.Toolbar.extend({
 				handler: new L.Draw.Rectangle(map, this.options.rectangle),
 				title: L.drawLocal.draw.toolbar.buttons.rectangle
 			},
-			//{
-			//	enabled: this.options.circle,
-			//	handler: new L.Draw.Circle(map, this.options.circle),
-			//	title: L.drawLocal.draw.toolbar.buttons.circle
-			//},
+			{
+				enabled: this.options.circle,
+				handler: new L.Draw.Circle(map, this.options.circle),
+				title: L.drawLocal.draw.toolbar.buttons.circle
+			},
 			{
 				enabled: this.options.marker,
 				handler: new L.Draw.Marker(map, this.options.marker),
 				title: L.drawLocal.draw.toolbar.buttons.marker
+			},
+			{
+				enabled: this.options.circlemarker,
+				handler: new L.Draw.CircleMarker(map, this.options.circlemarker),
+				title: L.drawLocal.draw.toolbar.buttons.circlemarker
 			}
 		];
 	},

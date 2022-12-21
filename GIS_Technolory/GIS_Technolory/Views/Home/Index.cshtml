@@ -4,61 +4,53 @@
 
 <script src="~/js/leaflet/leaflet-src.js"></script>
 <link href="~/css/leaflet.css" rel="stylesheet" />
+
+<script src="~/js/drawing/Leaflet.draw.js"></script>
+<script src="~/js/drawing/Leaflet.Draw.Event.js"></script>
+<link href="~/js/drawing/leaflet.draw.css" rel="stylesheet" />
+
+<script src="~/js/drawing/Toolbar.js"></script>
+<script src="~/js/drawing/Tooltip.js"></script>
+
+<script src="~/js/drawing/ext/GeometryUtil.js"></script>
+<script src="~/js/drawing/ext/LatLngUtil.js"></script>
+<script src="~/js/drawing/ext/LineUtil.Intersect.js"></script>
+<script src="~/js/drawing/ext/Polygon.Intersect.js"></script>
+<script src="~/js/drawing/ext/Polyline.Intersect.js"></script>
+<script src="~/js/drawing/ext/TouchEvents.js"></script>
+
+<script src="~/js/drawing/draw/DrawToolbar.js"></script>
+<script src="~/js/drawing/draw/handler/Draw.Feature.js"></script>
+<script src="~/js/drawing/draw/handler/Draw.SimpleShape.js"></script>
+<script src="~/js/drawing/draw/handler/Draw.Polyline.js"></script>
+<script src="~/js/drawing/draw/handler/Draw.Marker.js"></script>
+<script src="~/js/drawing/draw/handler/Draw.Circle.js"></script>
+<script src="~/js/drawing/draw/handler/Draw.CircleMarker.js"></script>
+<script src="~/js/drawing/draw/handler/Draw.Polygon.js"></script>
+<script src="~/js/drawing/draw/handler/Draw.Rectangle.js"></script>
+
+
+<script src="~/js/drawing/edit/EditToolbar.js"></script>
+<script src="~/js/drawing/edit/handler/EditToolbar.Edit.js"></script>
+<script src="~/js/drawing/edit/handler/EditToolbar.Delete.js"></script>
+
+<script src="~/js/drawing/Control.Draw.js"></script>
+
+<script src="~/js/drawing/edit/handler/Edit.Poly.js"></script>
+<script src="~/js/drawing/edit/handler/Edit.SimpleShape.js"></script>
+<script src="~/js/drawing/edit/handler/Edit.Rectangle.js"></script>
+<script src="~/js/drawing/edit/handler/Edit.Marker.js"></script>
+<script src="~/js/drawing/edit/handler/Edit.CircleMarker.js"></script>
+<script src="~/js/drawing/edit/handler/Edit.Circle.js"></script>
+
 <script src="~/js/geocoder/control.geocoder.js"></script>
 <link href="~/js/geocoder/control.geocoder.css" rel="stylesheet" />
-
-
-
-<script src="~/js/drawing/js/Leaflet.draw.js"></script>
-
-<script src="~/js/drawing/js/Leaflet.Draw.Event.js"></script>
-<link rel="stylesheet" href="~/js/drawing/css/leaflet.draw.css">
-
-<script src="~/js/drawing/js/LayersEventHandling.js"></script>
-
-<script src="~/js/drawing/js/Toolbar.js"></script>
-<script src="~/js/drawing/js/Tooltip.js"></script>
-
-<script src="~/js/drawing/js/GeometryUtil.js"></script>
-<script src="~/js/drawing/js/LatLngUtil.js"></script>
-<script src="~/js/drawing/js/LineUtil.Intersect.js"></script>
-<script src="~/js/drawing/js/Polygon.Intersect.js"></script>
-<script src="~/js/drawing/js/Polyline.Intersect.js"></script>
-<script src="~/js/drawing/js/TouchEvents.js"></script>
-
-<script src="~/js/drawing/js/DrawToolbar.js"></script>
-<script src="~/js/drawing/js/Draw.Feature.js"></script>
-<script src="~/js/drawing/js/Draw.SimpleShape.js"></script>
-<script src="~/js/drawing/js/Draw.Polyline.js"></script>
-<script src="~/js/drawing/js/Draw.Marker.js"></script>
-<script src="~/js/drawing/js/Draw.ViceMarker.js"></script>
-<script src="~/js/drawing/js/Draw.Circle.js"></script>
-<script src="~/js/drawing/js/Draw.CircleMarker.js"></script>
-<script src="~/js/drawing/js/Draw.Polygon.js"></script>
-<script src="~/js/drawing/js/Draw.Rectangle.js"></script>
-
-
-<script src="~/js/drawing/js/EditToolbar.js"></script>
-<script src="~/js/drawing/js/EditToolbar.Edit.js"></script>
-<script src="~/js/drawing/js/EditToolbar.Delete.js"></script>
-
-<script src="~/js/drawing/js/Control.Draw.js"></script>
-
-<script src="~/js/drawing/js/Edit.Poly.js"></script>
-<script src="~/js/drawing/js/Edit.SimpleShape.js"></script>
-<script src="~/js/drawing/js/Edit.Rectangle.js"></script>
-<script src="~/js/drawing/js/Edit.Marker.js"></script>
-<script src="~/js/drawing/js/Edit.ViceMarker.js"></script>
-<script src="~/js/drawing/js/Edit.CircleMarker.js"></script>
-<script src="~/js/drawing/js/Edit.Circle.js"></script>
-
-
 
 <link href="~/js/hightlight/leaflet.marker.highlight.css" rel="stylesheet" />
 <script src="~/js/hightlight/leaflet.marker.highlight.js"></script>
 
-<div class="text-center" style="height: 570px; position:relative">
-    <div id="GISMap" style="height: 570px;" class="leaflet-container leaflet-touch leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom">
+<div class="text-center" style="height: 590px; position:relative">
+    <div id="GISMap" style="height: 590px;" class="leaflet-container leaflet-touch leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom">
 
     </div>
     <div style="position:absolute; right:0px; top:0px; height:100%;max-height: inherit;">
@@ -181,8 +173,20 @@
                         "The free size map": mapWord
                     }, paramsJson, { position: 'topleft', collapsed: false }).addTo(map);
 
+                    let drawnItems = L.featureGroup().addTo(map);
+
                     map.addControl(new L.Control.Draw({
+                        edit: {
+                            featureGroup: drawnItems,
+                            poly: {
+                                allowIntersection: false
+                            }
+                        },
                         draw: {
+                            polygon: {
+                                allowIntersection: false,
+                                showArea: true
+                            },
                             polyline: {
                                 shapeOptions: {
                                     color: '#04B431',
@@ -191,6 +195,13 @@
                             }
                         }
                     }));
+
+
+                    map.on(L.Draw.Event.CREATED, function (event) {
+                        var layer = event.layer;
+
+                        drawnItems.addLayer(layer);
+                    });
 
                 }
                 else {

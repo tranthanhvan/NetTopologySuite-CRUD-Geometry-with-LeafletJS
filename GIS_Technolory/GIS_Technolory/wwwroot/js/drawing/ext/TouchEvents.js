@@ -37,17 +37,17 @@ L.Map.TouchExtend = L.Handler.extend({
 	// @method removeHooks(): void
 	// Removes dom listener events from the map container
 	removeHooks: function () {
-		L.DomEvent.off(this._container, 'touchstart', this._onTouchStart);
-		L.DomEvent.off(this._container, 'touchend', this._onTouchEnd);
-		L.DomEvent.off(this._container, 'touchmove', this._onTouchMove);
+		L.DomEvent.off(this._container, 'touchstart', this._onTouchStart, this);
+		L.DomEvent.off(this._container, 'touchend', this._onTouchEnd, this);
+		L.DomEvent.off(this._container, 'touchmove', this._onTouchMove, this);
 		if (this._detectIE()) {
-			L.DomEvent.off(this._container, 'MSPointerDowm', this._onTouchStart);
-			L.DomEvent.off(this._container, 'MSPointerUp', this._onTouchEnd);
-			L.DomEvent.off(this._container, 'MSPointerMove', this._onTouchMove);
-			L.DomEvent.off(this._container, 'MSPointerCancel', this._onTouchCancel);
+			L.DomEvent.off(this._container, 'MSPointerDown', this._onTouchStart, this);
+			L.DomEvent.off(this._container, 'MSPointerUp', this._onTouchEnd, this);
+			L.DomEvent.off(this._container, 'MSPointerMove', this._onTouchMove, this);
+			L.DomEvent.off(this._container, 'MSPointerCancel', this._onTouchCancel, this);
 		} else {
-			L.DomEvent.off(this._container, 'touchcancel', this._onTouchCancel);
-			L.DomEvent.off(this._container, 'touchleave', this._onTouchLeave);
+			L.DomEvent.off(this._container, 'touchcancel', this._onTouchCancel, this);
+			L.DomEvent.off(this._container, 'touchleave', this._onTouchLeave, this);
 		}
 	},
 
@@ -189,97 +189,6 @@ L.Map.addInitHook('addHandler', 'touchExtend', L.Map.TouchExtend);
  * #TODO: find a better way of getting markers to support touch.
  */
 L.Marker.Touch = L.Marker.extend({
-
-	_initInteraction: function () {
-		if (!this.addInteractiveTarget) {
-			// 0.7.x support
-			return this._initInteractionLegacy();
-		}
-		// TODO this may need be updated to re-add touch events for 1.0+
-		return L.Marker.prototype._initInteraction.apply(this);
-	},
-
-	// This is an exact copy of https://github.com/Leaflet/Leaflet/blob/v0.7/src/layer/marker/Marker.js
-	// with the addition of the touch events
-	_initInteractionLegacy: function () {
-
-		if (!this.options.clickable) {
-			return;
-		}
-
-		// TODO refactor into something shared with Map/Path/etc. to DRY it up
-
-		var icon = this._icon,
-			events = ['dblclick',
-				'mousedown',
-				'mouseover',
-				'mouseout',
-				'contextmenu',
-				'touchstart',
-				'touchend',
-				'touchmove'];
-		if (this._detectIE) {
-			events.concat(['MSPointerDown',
-				'MSPointerUp',
-				'MSPointerMove',
-				'MSPointerCancel']);
-		} else {
-			events.concat(['touchcancel']);
-		}
-
-		L.DomUtil.addClass(icon, 'leaflet-clickable');
-		L.DomEvent.on(icon, 'click', this._onMouseClick, this);
-		L.DomEvent.on(icon, 'keypress', this._onKeyPress, this);
-
-		for (var i = 0; i < events.length; i++) {
-			L.DomEvent.on(icon, events[i], this._fireMouseEvent, this);
-		}
-
-		if (L.Handler.MarkerDrag) {
-			this.dragging = new L.Handler.MarkerDrag(this);
-
-			if (this.options.draggable) {
-				this.dragging.enable();
-			}
-		}
-	},
-
-	_detectIE: function () {
-		var ua = window.navigator.userAgent;
-
-		var msie = ua.indexOf('MSIE ');
-		if (msie > 0) {
-			// IE 10 or older => return version number
-			return parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10);
-		}
-
-		var trident = ua.indexOf('Trident/');
-		if (trident > 0) {
-			// IE 11 => return version number
-			var rv = ua.indexOf('rv:');
-			return parseInt(ua.substring(rv + 3, ua.indexOf('.', rv)), 10);
-		}
-
-		var edge = ua.indexOf('Edge/');
-		if (edge > 0) {
-			// IE 12 => return version number
-			return parseInt(ua.substring(edge + 5, ua.indexOf('.', edge)), 10);
-		}
-
-		// other browser
-		return false;
-	}
-});
-
-
-/**
- * @class L.Marker.Touch
- * @aka Marker.Touch
- *
- * This isn't full Touch support. This is just to get markers to also support dom touch events after creation
- * #TODO: find a better way of getting markers to support touch.
- */
-L.ViceMarker.Touch = L.ViceMarker.extend({
 
 	_initInteraction: function () {
 		if (!this.addInteractiveTarget) {

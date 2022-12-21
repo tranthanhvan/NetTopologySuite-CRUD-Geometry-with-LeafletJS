@@ -1,11 +1,11 @@
 /**
- * @class L.Draw.ViceMarker
- * @aka Draw.ViceMarker
+ * @class L.Draw.Marker
+ * @aka Draw.Marker
  * @inherits L.Draw.Feature
  */
-L.Draw.ViceMarker = L.Draw.Feature.extend({
+L.Draw.Marker = L.Draw.Feature.extend({
 	statics: {
-		TYPE: 'vicemarker'
+		TYPE: 'marker'
 	},
 
 	options: {
@@ -17,9 +17,9 @@ L.Draw.ViceMarker = L.Draw.Feature.extend({
 	// @method initialize(): void
 	initialize: function (map, options) {
 		// Save the type so super can fire, need to do this as cannot do this.TYPE :(
-		this.type = L.Draw.ViceMarker.TYPE;
+		this.type = L.Draw.Marker.TYPE;
 
-		this._initialLabelText = L.drawLocal.draw.handlers.vicemarker.tooltip.start;
+		this._initialLabelText = L.drawLocal.draw.handlers.marker.tooltip.start;
 
 		L.Draw.Feature.prototype.initialize.call(this, map, options);
 	},
@@ -34,11 +34,11 @@ L.Draw.ViceMarker = L.Draw.Feature.extend({
 
 			// Same mouseMarker as in Draw.Polyline
 			if (!this._mouseMarker) {
-				this._mouseMarker = L.vicemarker(this._map.getCenter(), {
+				this._mouseMarker = L.marker(this._map.getCenter(), {
 					icon: L.divIcon({
-						className: 'leaflet-mouse-vicemarker',
-						iconAnchor: [10, 10],
-						iconSize: [L.Draw.constants.iconSize, L.Draw.constants.iconSize]
+						className: 'leaflet-mouse-marker',
+						iconAnchor: [20, 20],
+						iconSize: [40, 40]
 					}),
 					opacity: 0,
 					zIndexOffset: this.options.zIndexOffset
@@ -99,7 +99,7 @@ L.Draw.ViceMarker = L.Draw.Feature.extend({
 	},
 
 	_createMarker: function (latlng) {
-		return new L.ViceMarker(latlng, {
+		return new L.Marker(latlng, {
 			icon: this.options.icon,
 			zIndexOffset: this.options.zIndexOffset
 		});
@@ -121,7 +121,7 @@ L.Draw.ViceMarker = L.Draw.Feature.extend({
 	},
 
 	_fireCreatedEvent: function () {
-		var marker = new L.ViceMarker.Touch(this._marker.getLatLng(), {icon: this.options.icon});
+		var marker = new L.Marker.Touch(this._marker.getLatLng(), {icon: this.options.icon});
 		L.Draw.Feature.prototype._fireCreatedEvent.call(this, marker);
 	}
 });

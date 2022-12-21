@@ -140,7 +140,6 @@
 	}
 .leaflet-control {
 	float: left;
-	clear: both;
 	}
 .leaflet-right .leaflet-control {
 	float: right;

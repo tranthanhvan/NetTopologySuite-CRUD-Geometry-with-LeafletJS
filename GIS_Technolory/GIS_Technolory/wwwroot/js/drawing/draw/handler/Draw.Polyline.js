@@ -22,10 +22,10 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 			className: 'leaflet-div-icon leaflet-editing-icon'
 		}),
 		touchIcon: new L.DivIcon({
-			iconSize: new L.Point(L.Draw.constants.anchorSize, L.Draw.constants.anchorSize),
+			iconSize: new L.Point(20, 20),
 			className: 'leaflet-div-icon leaflet-editing-icon leaflet-touch-icon'
 		}),
-		guidelineDistance: L.Draw.constants.anchorSize,
+		guidelineDistance: 20,
 		maxGuideLineLength: 4000,
 		shapeOptions: {
 			stroke: true,
@@ -88,8 +88,8 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 				this._mouseMarker = L.marker(this._map.getCenter(), {
 					icon: L.divIcon({
 						className: 'leaflet-mouse-marker',
-						iconAnchor: [L.Draw.constants.anchorSize, L.Draw.constants.anchorSize],
-						iconSize: [L.Draw.constants.iconSize, L.Draw.constants.iconSize]
+						iconAnchor: [20, 20],
+						iconSize: [40, 40]
 					}),
 					opacity: 0,
 					zIndexOffset: this.options.zIndexOffset
@@ -523,6 +523,7 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 		} else {
 			distance = previousLatLng && currentLatLng ? this._measurementRunningTotal + this._map.distance(currentLatLng, previousLatLng) * (this.options.factor || 1) : this._measurementRunningTotal || 0;
 		}
+
 		return L.GeometryUtil.readableDistance(distance, this.options.metric, this.options.feet, this.options.nautic, this.options.precision);
 	},
 
