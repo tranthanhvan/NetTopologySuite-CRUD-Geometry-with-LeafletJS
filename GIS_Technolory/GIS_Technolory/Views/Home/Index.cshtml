@@ -589,7 +589,8 @@
                             {
                                 let inforPolyline = {
                                     color: $response.Data.ColorLine,
-                                    weight: $response.Data.WeightLine
+                                    weight: $response.Data.WeightLine,
+                                    id : $response.Data.ID
                                 };
 
                                 var polyline = L.polyline([$response.Data.OnlyLatLongs], inforPolyline);
@@ -610,59 +611,59 @@
                             }
                             else //Update case
                             {
-                                //Remove Old
-                                let ArrLngs = $response.Latlngs;
+                                let LayerLngs = $response.Data.Polyline.OnlyLatLongs;
 
-                                let LayerLngs = [];
-
-                                ArrLngs.forEach(function (item) {
-                                    let itemInject = {
-                                        lat: item.lat,
-                                        lng: item.lng
-                                    };
-                                    LayerLngs.push(itemInject);
-                                });
-
-                                window[$response.OldMapLayer].eachLayer(function (layer) {
-                                    debugger;
-                                    if (JSON.stringify(layer._latlngs) == JSON.stringify([LayerLngs])) {
-                                        window[$response.OldMapLayer].removeLayer(layer);
-                                        return;
-                                    }
-                                });
-
-                                //Replace Layer
-
-                                let InforCabline = {
-                                    color: $response.MapLayer.ColorLine,
-                                    weight: $response.MapLayer.WeightLine
-                                };
-
-                                let polyline = L.polyline([$response.Latlngs], InforCabline);
-
-                                polyline.bindPopup($response.PopupContent);
-
-                                window[$response.MapLayer.MapName].addLayer(polyline);
-
-                                window[$response.MapLayer.MapName].on('mouseover', function (e) {
-                                    var layer = e.layer;
-                                    layer.setStyle({
-                                        color: 'blue',
-                                        opacity: 1,
-                                        weight: 10
+                                if ($response.Data.Polyline.MapName == $response.Data.OldMapLayer) //Not change type . only need change popup
+                                {
+                                    window[$response.Data.Polyline.MapName].eachLayer(function (layer) {
+                                        debugger;
+                                        if (JSON.stringify(layer._latlngs) == JSON.stringify([LayerLngs])) {
+                                            layer.bindPopup($response.Data.Polyline.PopupContent);
+                                            return;
+                                        }
                                     });
-                                });
 
-                                window[$response.MapLayer.MapName].on('mouseout', function (e) {
-                                    var layer = e.layer;
-                                    layer.setStyle(InforCabline);
-                                });
+                                    let modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-polyline'))
+                                    modal.hide();
 
+                                    Toast.fire({
+                                        icon: 'success',
+                                        title: $response.Message
+                                    });
+                                }
+                                else //Remove old layer & replace
+                                {
+                                    window[$response.Data.OldMapLayer].eachLayer(function (layer) {
+                                        if (JSON.stringify(layer._latlngs) == JSON.stringify([LayerLngs])) {
+                                            window[$response.Data.OldMapLayer].removeLayer(layer);
+                                            drawnItems.removeLayer(layer);
+                                            return;
+                                        }
+                                    });
 
-                                Toast.fire({
-                                    icon: 'success',
-                                    title: $response.Message
-                                });
+                                    //Replace Layer
+                                    let InforPolyline = {
+                                        color: $response.Data.Polyline.ColorLine,
+                                        weight: $response.Data.Polyline.WeightLine,
+                                        id : $response.Data.Polyline.ID
+                                    };
+
+                                    let polyline = L.polyline([LayerLngs], InforPolyline);
+
+                                    polyline.bindPopup($response.Data.Polyline.PopupContent);
+
+                                    window[$response.Data.Polyline.MapName].addLayer(polyline);
+                                    drawnItems.addLayer(polyline);
+
+                                    let modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-polyline'))
+                                    modal.hide();
+
+                                    Toast.fire({
+                                        icon: 'success',
+                                        title: $response.Message
+                                    });
+
+                                }
                                 collectionLatLngsLocal = [];
                             }
                         }
@@ -688,6 +689,109 @@
         });
     }
 
+    function DeletePolyline(id) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    type: "GET",
+                    url: "/Polyline/DeletePolyline",
+                    beforeSend: function () {
+                        $(".loading-bar").show();
+                    },
+                    complete: function () {
+                        $(".loading-bar").hide();
+                    },
+                    data: {
+                        id: id
+                    },
+                    success: function (response) {
+                        var $response = response;
+                        if ($response.Success) {
+                            
+                            let LayerLngs = $response.Data.OnlyLatLongs;
+
+                            window[$response.Data.MapName].eachLayer(function (layer) {
+                                if (JSON.stringify(layer._latlngs) == JSON.stringify([LayerLngs])) {
+                                    window[$response.Data.MapName].removeLayer(layer);
+                                    drawnItems.removeLayer(layer);
+                                    return;
+                                }
+                            });
+
+                            Toast.fire({
+                                icon: 'success',
+                                title: $response.Message
+                            });
+
+                        }
+                        else {
+                            Toast.fire({
+                                icon: 'error',
+                                title: $response.Message
+                            })
+                        }
+                    }
+                });
+            }
+        })
+    }
+
+    function UpdateLocationPolyline(raw) {
+        $.ajax({
+            type: "POST",
+            url: "Polyline/UpdateLocation",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $(".loading-bar").show();
+            },
+            complete: function () {
+                $(".loading-bar").hide();
+            },
+            data: JSON.stringify(raw),
+            success: function (response) {
+                var $response = response;
+                if ($response.Success) {
+
+                    window[$response.Data.MapName].eachLayer(function (layer) {
+                        if (JSON.stringify(layer._latlngs) == JSON.stringify([$response.Data.OnlyLatLongs])) {
+                            layer.bindPopup($response.Data.PopupContent);
+                            return;
+                        }
+                    });
+
+                    Toast.fire({
+                        icon: 'success',
+                        title: $response.Message
+                    });
+                }
+                else {
+                    Swal.fire({
+                        title: 'Notification',
+                        text: $response.Message,
+                        icon: 'error',
+                        confirmButtonText: 'Close'
+                    });
+                }
+            },
+            error: function (data) {
+                Swal.fire({
+                    title: 'Notification',
+                    text: 'Error when call api controller',
+                    icon: 'error',
+                    confirmButtonText: 'Close'
+                });
+            }
+        });
+    }
+
     // #endregion Polyline
 
     function getLayerType(layer) {
@@ -696,11 +800,17 @@
         if (layer instanceof L.Marker) {
             layerType = "Marker";
         }
+        else if (layer instanceof L.Polygon) {
+            layerType = "Polygon";
+        }
         else if (layer instanceof L.Polyline) {
             layerType = "Polyline";
         }
-        else if (layer instanceof L.Polygon) {
-            layerType = "Polygon";
+        else if (layer instanceof L.Circle) {
+            layerType = "Circle";
+        }
+        else if (layer instanceof L.CircleMarker) {
+            layerType = "CircleMarker";
         }
         return layerType;
     };
@@ -793,7 +903,7 @@
                             polyline: {
                                 shapeOptions: {
                                     color: '#04B431',
-                                    weight: 7,
+                                    weight: 5,
                                 }
                             }
                         },
@@ -839,9 +949,9 @@
                     map.on(L.Draw.Event.EDITED, function (event) {
                         debugger;
                         var layer = Object.values(event.layers._layers)[0].editing;
-                            layerType = getLayerType(layer._marker);
+                        //layerType = getLayerType(layer._marker);
 
-                        if (layerType === 'Marker') 
+                        if (typeof layer._marker !== 'undefined')  //Marker
                         {
                             let latLng = Object.values(event.layers._layers)[0]._latlng;
                             let idMarker = Object.values(event.layers._layers)[0].options.icon.options.id;
@@ -851,8 +961,36 @@
                                 Lat : latLng.lat,
                                 Long: latLng.lng
                             };
-
                             UpdateLocationMarker(raw)
+                        }
+                        else if(typeof layer._poly !== 'undefined') {
+                            debugger;
+                            let idPolyline = layer._poly.options.id;
+                            let latLngs = layer._poly._latlngs;
+
+                            let centralLatlngs = layer._poly.getBounds().getCenter().lat + ',' + layer._poly.getBounds().getCenter().lng;
+
+                            let CablineLatlngsCU = [];
+                            let order = 1;
+                            latLngs[0].forEach(function (item) {
+                                let itemInject = {
+                                    Order: order,
+                                    Latitude: item.lat,
+                                    Longitude: item.lng
+                                };
+                                CablineLatlngsCU.push(itemInject);
+                                order++;
+                            });
+                            let lengthCabline = distance(latLngs[0]);
+
+                            let raw = {
+                                ID : idPolyline,
+                                CablineLength : lengthCabline,
+                                CentralLatlng: centralLatlngs,
+                                LatLongs : CablineLatlngsCU
+                            };
+
+                            UpdateLocationPolyline(raw)
                         }
                     });
 
@@ -882,7 +1020,8 @@
                     {
                         let InforCabline = {
                             color: ArrCabline[i].ColorLine,
-                            weight: ArrCabline[i].WeightLine
+                            weight: ArrCabline[i].WeightLine,
+                            id : ArrCabline[i].ID
                         };
 
                         let polyline = L.polyline([ArrCabline[i].OnlyLatLongs], InforCabline);

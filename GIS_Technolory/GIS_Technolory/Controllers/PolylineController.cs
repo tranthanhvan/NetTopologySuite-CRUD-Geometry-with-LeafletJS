@@ -62,7 +62,7 @@ namespace GIS_Technolory.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateInfor([FromBody] PolylineModel uploadRecord)
         {
-            var response = new Response<Polyline>();
+            var response = new Response<object>();
             try
             {
                 Polyline polyline = await _polylineService.Get(uploadRecord.ID);
@@ -74,13 +74,37 @@ namespace GIS_Technolory.Controllers
                 else
                 {
                     string oldMapName = polyline.Type.MapName;
-                    polyline.Name = uploadRecord?.Name;
+                    polyline.Name = uploadRecord.Name;
                     polyline.TypeID = uploadRecord.TypeID;
                     await _polylineService.Update(polyline);
 
-                    response.Data = await _polylineService.Get(uploadRecord.ID);
+                    polyline = await _polylineService.Get(uploadRecord.ID);
+
+                    response.Data = new
+                    {
+                        Polyline = new PolylineModel()
+                        {
+                            ID = polyline.ID,
+                            Name = polyline.Name,
+                            PopupContent = polyline.PopupContent,
+                            CablineLength = polyline.CablineLength,
+                            TypeID = polyline.TypeID,
+                            TypeName = polyline.Type.Name,
+                            MapName = polyline.Type.MapName,
+                            ColorLine = polyline.Type.ColorLine,
+                            WeightLine = polyline.Type.WeightLine,
+                            LatLongs = polyline.LatLongs.Select(c => new PolylineLatLongModel()
+                            {
+                                ID = c.ID,
+                                Latitude = c.Latitude,
+                                Longitude = c.Longitude,
+                                Order = c.Order
+                            }).ToList()
+                        },
+                        OldMapLayer = oldMapName
+                    };
                     response.Success = response.Data != null;
-                    response.Message = "Update Polyline is successful";
+                    response.Message = "Update info Polyline is successful";
                 }
             }
             catch (Exception ex)
@@ -156,6 +180,115 @@ namespace GIS_Technolory.Controllers
 
                 response.Data = await this.RenderViewAsync("_DetailPolyline", modelResult, true);
                 response.Success = !string.IsNullOrEmpty(response.Data);
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message + ex.InnerException;
+            }
+            return Ok(response);
+        }
+
+        public async Task<IActionResult> DeletePolyline(string id)
+        {
+            var response = new Response<PolylineModel>();
+            try
+            {
+                var polyline = await _polylineService.Get(id);
+                if (polyline is null)
+                {
+                    response.Success = false;
+                    response.Message = "Polyline is not found in databases";
+                }
+                else
+                {
+                    response.Data = new PolylineModel()
+                    {
+                        ID = polyline.ID,
+                        Name = polyline.Name,
+                        PopupContent = polyline.PopupContent,
+                        CablineLength = polyline.CablineLength,
+                        TypeID = polyline.TypeID,
+                        TypeName = polyline.Type.Name,
+                        MapName = polyline.Type.MapName,
+                        ColorLine = polyline.Type.ColorLine,
+                        WeightLine = polyline.Type.WeightLine,
+                        LatLongs = polyline.LatLongs.Select(c => new PolylineLatLongModel()
+                        {
+                            ID = c.ID,
+                            Latitude = c.Latitude,
+                            Longitude = c.Longitude,
+                            Order = c.Order
+                        }).ToList()
+                    };
+                    response.Success = await _polylineService.Delete(id);
+                    response.Message = "Delete Polyline is successful";
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message + ex.InnerException;
+            }
+            return Ok(response);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateLocation([FromBody] PolylineModel uploadRecord)
+        {
+            var response = new Response<PolylineModel>();
+            try
+            {
+                Polyline polyline = await _polylineService.Get(uploadRecord.ID);
+                if (polyline is null)
+                {
+                    response.Success = false;
+                    response.Message = "Polyline is not found in databases";
+                }
+                else
+                {
+                    if(uploadRecord.LatLongs.Count <= 1)
+                    {
+                        response.Success = false;
+                        response.Message = "Latlong input is invalid (<= 1 couple)";
+                    }
+                    else
+                    {
+                        polyline.LatLongs = uploadRecord.LatLongs.Select(x => new PolylineLatLong()
+                        {
+                            ID = Guid.NewGuid().ToString(),
+                            Location = new NetTopologySuite.Geometries.Point(x.Longitude, x.Latitude) { SRID = 4326 },
+                            Order = x.Order,
+                            PolylineID = uploadRecord.ID
+                        }).ToList();
+                        polyline.CablineLength = uploadRecord.CablineLength;
+                        polyline.CentralLatlng = uploadRecord.CentralLatlng;
+                        await _polylineService.Update(polyline);
+                        response.Data = new PolylineModel()
+                        {
+                            ID = polyline.ID,
+                            Name = polyline.Name,
+                            PopupContent = polyline.PopupContent,
+                            CablineLength = polyline.CablineLength,
+                            TypeID = polyline.TypeID,
+                            TypeName = polyline.Type.Name,
+                            MapName = polyline.Type.MapName,
+                            ColorLine = polyline.Type.ColorLine,
+                            WeightLine = polyline.Type.WeightLine,
+                            LatLongs = polyline.LatLongs.Select(c => new PolylineLatLongModel()
+                            {
+                                ID = c.ID,
+                                Latitude = c.Latitude,
+                                Longitude = c.Longitude,
+                                Order = c.Order
+                            }).ToList()
+                        }; ;
+                        response.Success = true;
+                        response.Message = "Update Location polyline is successful";
+                        response.Success = true;
+                    }
+                }
             }
             catch (Exception ex)
             {

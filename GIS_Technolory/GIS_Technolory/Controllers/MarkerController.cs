@@ -70,7 +70,7 @@ namespace GIS_Technolory.Controllers
                         OldMap = oldMapName
                     };
                     response.Success = response.Data != null;
-                    response.Message = "Update marker is successful";
+                    response.Message = "Update infor marker is successful";
                 }
             }
             catch (Exception ex)

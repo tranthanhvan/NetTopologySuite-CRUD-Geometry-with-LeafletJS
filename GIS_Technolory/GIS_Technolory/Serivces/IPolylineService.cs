@@ -67,7 +67,7 @@ namespace GIS_Technolory.Serivces
 
         public async Task<bool> Delete(string id)
         {
-            Polyline target = await _Context.Polylines.FirstOrDefaultAsync(x => x.ID.Equals(id));
+            Polyline target = await _Context.Polylines.Include(x=>x.LatLongs).FirstOrDefaultAsync(x => x.ID.Equals(id));
             if (target is null)
                 return false;
             else
