@@ -57,6 +57,25 @@ namespace GIS_Technolory.Controllers
                         PopupContent = x.PopupContent,
                         MapName = x.Type.MapName,
                         IconType= x.Type.Icon
+                    }),
+                    Polylines = polylines.Select(x=> new PolylineModel()
+                    {
+                        ID = x.ID,
+                        Name = x.Name,
+                        PopupContent = x.PopupContent,
+                        CablineLength = x.CablineLength,
+                        TypeID = x.TypeID,
+                        TypeName = x.Type.Name,
+                        MapName = x.Type.MapName,
+                        ColorLine = x.Type.ColorLine,
+                        WeightLine = x.Type.WeightLine,
+                        LatLongs = x.LatLongs.Select(c => new PolylineLatLongModel()
+                        {
+                            ID = c.ID,
+                            Latitude = c.Latitude,
+                            Longitude = c.Longitude,
+                            Order = c.Order
+                        }).ToList()
                     })
                 };
             }

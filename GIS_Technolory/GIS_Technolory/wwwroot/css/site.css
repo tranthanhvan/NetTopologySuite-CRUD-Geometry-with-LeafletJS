@@ -143,3 +143,23 @@ body.loading .loading-bar {
     color: red;
     font-size: 13px;
 }
+
+.css_bg_view {
+    background-color: #f5f5f5;
+    padding: 6px;
+    word-wrap: break-word;
+}
+
+.popup-title-lf {
+    display: table;
+}
+
+.sp-pup-tittle-lf {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.act-popup-leaflet {
+    margin-left: auto !important;
+    margin-right: 0 !important;
+}

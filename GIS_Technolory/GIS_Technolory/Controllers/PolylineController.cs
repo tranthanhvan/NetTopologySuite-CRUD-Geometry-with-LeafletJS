@@ -21,13 +21,13 @@ namespace GIS_Technolory.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] PolylineModel uploadRecord)
         {
-            var response = new Response<Polyline>();
+            var response = new Response<PolylineModel>();
             try
             {
-                string id = Guid.NewGuid().ToString();
-                response.Data = await _polylineService.Create(new Polyline()
+                uploadRecord.ID = Guid.NewGuid().ToString();
+                await _polylineService.Create(new Polyline()
                 {
-                    ID = id,
+                    ID = uploadRecord.ID,
                     Name = uploadRecord.Name,
                     CablineLength = uploadRecord.CablineLength,
                     CentralLatlng = uploadRecord.CentralLatlng,
@@ -37,9 +37,17 @@ namespace GIS_Technolory.Controllers
                         ID = Guid.NewGuid().ToString(),
                         Location = new NetTopologySuite.Geometries.Point(x.Longitude, x.Latitude) { SRID = 4326 },
                         Order = x.Order,
-                        PolylineID = id
+                        PolylineID = uploadRecord.ID
                     }).ToList()
                 });
+                var model = await _polylineService.Get(uploadRecord.ID);
+                uploadRecord.MapName = model.Type.MapName;
+                uploadRecord.TypeName = model.Type.Name;
+                uploadRecord.WeightLine = model.Type.WeightLine;
+                uploadRecord.ColorLine = model.Type.ColorLine;
+                uploadRecord.PopupContent = model.PopupContent;
+
+                response.Data = uploadRecord;
                 response.Success = response.Data != null;
                 response.Message = "Create Polyline is successful";
             }
@@ -52,7 +60,7 @@ namespace GIS_Technolory.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Update([FromBody] PolylineModel uploadRecord)
+        public async Task<IActionResult> UpdateInfor([FromBody] PolylineModel uploadRecord)
         {
             var response = new Response<Polyline>();
             try
@@ -65,9 +73,12 @@ namespace GIS_Technolory.Controllers
                 }
                 else
                 {
+                    string oldMapName = polyline.Type.MapName;
                     polyline.Name = uploadRecord?.Name;
                     polyline.TypeID = uploadRecord.TypeID;
-                    response.Data = await _polylineService.Update(polyline);
+                    await _polylineService.Update(polyline);
+
+                    response.Data = await _polylineService.Get(uploadRecord.ID);
                     response.Success = response.Data != null;
                     response.Message = "Update Polyline is successful";
                 }

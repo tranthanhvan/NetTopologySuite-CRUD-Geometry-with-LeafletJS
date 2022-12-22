@@ -14,8 +14,23 @@
 
         public string CentralLatlng { get; set; }
 
+        #region Infor type
+        public string TypeName { get; set; }
+
+        public string MapName { get; set; }
+
+        public string ColorLine { get; set; }
+
+        public int WeightLine { get; set; }
+        #endregion
+
         public virtual List<PolylineLatLongModel> LatLongs { get; set; }
-    }
+
+        public virtual List<LatLongModel> OnlyLatLongs
+        {
+            get => LatLongs.Select(x => new LatLongModel() { lat = x.Latitude, lng = x.Longitude }).ToList();
+        }
+    } 
 
     public class PolylineLatLongModel
     {

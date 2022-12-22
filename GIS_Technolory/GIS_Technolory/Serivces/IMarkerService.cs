@@ -25,12 +25,29 @@ namespace GIS_Technolory.Serivces
         {
             string typeName = string.Empty;
             typeName = _Context.TypeMarkers.FirstOrDefault(x => x.ID.Equals(uploadRecord.TypeID)).Name;
-            uploadRecord.PopupContent = "<b>Name : " + uploadRecord.Name + "</b><br>"
-                                      + "<b>Type : " + typeName + "</b><br>"
-                                      + "<b>Latitude : " + uploadRecord.Latitude + "</b></br>"
-                                      + "<b>Longitude : " + uploadRecord.Longitude + "</b></br>"
-                                      + "<div class='swal2-actions'><button id='btnedit' value='" + uploadRecord.Latitude + "," + uploadRecord.Longitude + "' onclick='EditFromMap(\"" + uploadRecord.ID + "\")' class='swal2-confirm swal2-styled'>Edit</button>&nbsp;&nbsp;&nbsp;"
-                                      + "<button id='btndelete' value='" + uploadRecord.Latitude + "," + uploadRecord.Longitude + "' onclick='Delete(\"" + uploadRecord.ID + "\")' class='swal2-deny swal2-styled'>Delete</button></div>";
+            uploadRecord.PopupContent = $@"<div style='width : 280px'>
+                                              <div class='row row_padding'>
+                                                  <div class='col-3 popup-title-lf'>
+                                                      <span class='sp-pup-tittle-lf'>Name</span>
+                                                  </div>
+                                                  <div class='col-9 css_bg_view'>
+                                                      <span>{uploadRecord.Name}</span>
+                                                  </div>
+                                               </div>
+                                               <div class='row row_padding'>
+                                                  <div class='col-3 popup-title-lf'>
+                                                      <span class='sp-pup-tittle-lf'>Type</span>
+                                                  </div>
+                                                  <div class='col-9 css_bg_view'>
+                                                      <span>{typeName}</span>
+                                                  </div>
+                                               </div>
+                                              <div class='swal2-actions'>
+                                                  <button onclick='EditFromMap(`{uploadRecord.ID}`)' class='swal2-confirm swal2-styled act-popup-leaflet'>Edit info</button>&nbsp;
+                                                  <button onclick='Delete(`{uploadRecord.ID}`)' class='swal2-deny swal2-styled'>Delete</button>
+                                              </div>
+                                            </div>
+                                          ";
             EntityEntry<Marker> record = await _Context.AddAsync(uploadRecord);
             int result = await _Context.SaveChangesAsync();
             if (result == 1)
@@ -72,12 +89,29 @@ namespace GIS_Technolory.Serivces
         {
             string typeName = string.Empty;
             typeName = _Context.TypeMarkers.FirstOrDefault(x => x.ID.Equals(uploadRecord.TypeID)).Name;
-            uploadRecord.PopupContent = "<b>Name : " + uploadRecord.Name + "</b><br>"
-                                      + "<b>Type : " + typeName + "</b><br>"
-                                      + "<b>Latitude : " + uploadRecord.Latitude + "</b></br>"
-                                      + "<b>Longitude : " + uploadRecord.Longitude + "</b></br>"
-                                      + "<div class='swal2-actions'><button id='btnedit' value='" + uploadRecord.Latitude + "," + uploadRecord.Longitude + "' onclick='EditFromMap(\"" + uploadRecord.ID + "\")' class='swal2-confirm swal2-styled'>Edit</button>&nbsp;&nbsp;&nbsp;"
-                                      + "<button id='btndelete' value='" + uploadRecord.Latitude + "," + uploadRecord.Longitude + "' onclick='Delete(\"" + uploadRecord.ID + "\")' class='swal2-deny swal2-styled'>Delete</button></div>";
+            uploadRecord.PopupContent = $@"<div style='width : 280px'>
+                                              <div class='row row_padding'>
+                                                  <div class='col-3 popup-title-lf'>
+                                                      <span class='sp-pup-tittle-lf'>Name</span>
+                                                  </div>
+                                                  <div class='col-9 css_bg_view'>
+                                                      <span>{uploadRecord.Name}</span>
+                                                  </div>
+                                               </div>
+                                               <div class='row row_padding'>
+                                                  <div class='col-3 popup-title-lf'>
+                                                      <span class='sp-pup-tittle-lf'>Type</span>
+                                                  </div>
+                                                  <div class='col-9 css_bg_view'>
+                                                      <span>{typeName}</span>
+                                                  </div>
+                                               </div>
+                                              <div class='swal2-actions'>
+                                                  <button onclick='EditFromMap(`{uploadRecord.ID}`)' class='swal2-confirm swal2-styled act-popup-leaflet'>Edit info</button>&nbsp;
+                                                  <button onclick='Delete(`{uploadRecord.ID}`)' class='swal2-deny swal2-styled'>Delete</button>
+                                              </div>
+                                            </div>
+                                          ";
 
             EntityEntry<Marker> record = _Context.Update(uploadRecord);
             int result = await _Context.SaveChangesAsync();

@@ -45,7 +45,7 @@ namespace GIS_Technolory.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> Update([FromBody] MarkerModel uploadRecord)
+        public async Task<IActionResult> UpdateInfor([FromBody] MarkerModel uploadRecord)
         {
             var response = new Response<object>();
             try
@@ -71,6 +71,37 @@ namespace GIS_Technolory.Controllers
                     };
                     response.Success = response.Data != null;
                     response.Message = "Update marker is successful";
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message + ex.InnerException;
+            }
+            return Ok(response);
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateLocation([FromBody] MarkerModel uploadRecord)
+        {
+            var response = new Response<object>();
+            try
+            {
+                Marker marker = await _markerService.Get(uploadRecord.ID);
+
+                if (marker is null)
+                {
+                    response.Success = false;
+                    response.Message = "Marker is not found in databases";
+                }
+                else
+                {
+                    marker.Location = new NetTopologySuite.Geometries.Point(uploadRecord.Long, uploadRecord.Lat) { SRID = 4326 };
+                    await _markerService.Update(marker);
+                    response.Data = marker;
+                    response.Success = response.Data != null;
+                    response.Message = "Update Location marker is successful";
                 }
             }
             catch (Exception ex)

@@ -118,7 +118,7 @@
 
             </div>
             <div class="modal-footer">
-                <button type="submit" class="btn btn-primary">Save changes</button>
+                <button type="submit" class="btn btn-primary" form="form-polyline-input">Save changes</button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
@@ -133,8 +133,8 @@
         googleAttrib = 'Bạn đang sử dụng <a href="https://www.google.com/maps/">&copy; Google Map</a>',
 
         osm = L.tileLayer(osmUrl, {
-            maxZoom: 17,
-            minZoom: 10,
+            maxZoom: 19,
+            minZoom: 2,
             attribution: osmAttrib
         });
 
@@ -144,8 +144,8 @@
     });
 
     googleStreets = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
-        maxZoom: 17,
-        minZoom: 10,
+        maxZoom: 19,
+        minZoom: 2,
         subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
         attribution: googleAttrib
     });
@@ -155,6 +155,11 @@
     map = new L.Map('GISMap', { center: new L.LatLng(21.028511, 105.804817), zoom: 14 });
 
     L.control.scale().addTo(map);
+
+    var collectionLatLngsLocal = [];
+
+    //Draw & edit tool
+    var drawnItems = L.featureGroup().addTo(map);
 
     var geocoder = L.Control.geocoder({
         defaultMarkGeocode: false
@@ -176,6 +181,8 @@
             map.removeLayer(poly);
         }, 5000);
     }).addTo(map);
+
+    // #region Marker
 
     function EditFromMap(idMarker) {
         GetMarker(idMarker,0,0);
@@ -213,7 +220,10 @@
                                 }
                                 else {
                                     if (layer._latlng.lat == $response.Data.Latitude && layer._latlng.lng == $response.Data.Longitude) {
+
                                         window[$response.Data.Type.MapName].removeLayer(layer);
+                                        drawnItems.removeLayer(layer);
+
                                         Toast.fire({
                                             icon: 'success',
                                             title: $response.Message
@@ -235,8 +245,7 @@
         })
     }
 
-
-    function GetMarker(id , lat, long) {
+    function GetMarker(id, lat, long) {
         let raw = {
             ID: id,
             Lat: 0,
@@ -281,7 +290,6 @@
         });
     }
 
-
     function SetValidFormMaker() {
         $('#form-marker-input').validate({
             ignore: "",
@@ -314,8 +322,8 @@
                     TypeID: $('#form-marker-input-typemarker').val()
                 }
 
-                let url = '/Marker/Update';
-                if(model.ID == null || model.ID == ''){
+                let url = '/Marker/UpdateInfor';
+                if (model.ID == null || model.ID == '') {
                     url = '/Marker/Create';
                 }
 
@@ -333,23 +341,24 @@
                     success: function (response) {
                         var $response = response;
                         if ($response.Success) {
-                            if( url == '/Marker/Create') {
+                            if (url == '/Marker/Create') {
                                 let MarkerInfo = L.Icon.extend({
                                     options: {
                                         //shadowUrl: '/images/marker-shadow.png',
                                         iconAnchor: new L.Point(L.Draw.constants.anchorSize, L.Draw.constants.anchorSize),
                                         iconSize: new L.Point(L.Draw.constants.iconSize, L.Draw.constants.iconSize),
-                                        iconUrl: $response.Data.Type.Icon
+                                        iconUrl: $response.Data.Type.Icon,
+                                        id: $response.Data.ID
                                     }
                                 });
 
                                 let CreateMarker = L.marker([$response.Data.Latitude, $response.Data.Longitude],
                                     {
-                                        icon: new MarkerInfo(),
-                                        highlight: "temporary"
+                                        icon: new MarkerInfo()
                                     }).bindPopup($response.Data.PopupContent);
 
                                 window[$response.Data.Type.MapName].addLayer(CreateMarker);
+                                drawnItems.addLayer(CreateMarker);
 
                                 let modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-marker'))
                                 modal.hide();
@@ -370,23 +379,26 @@
                                         if (layer._latlng.lat == $response.Data.Marker.Latitude && layer._latlng.lng == $response.Data.Marker.Longitude) {
 
                                             window[$response.Data.OldMap].removeLayer(layer);
+                                            drawnItems.removeLayer(layer);
 
                                             let MarkerInfo = L.Icon.extend({
                                                 options: {
                                                     iconAnchor: new L.Point(L.Draw.constants.anchorSize, L.Draw.constants.anchorSize),
                                                     iconSize: new L.Point(L.Draw.constants.iconSize, L.Draw.constants.iconSize),
-                                                    iconUrl: $response.Data.Marker.Type.Icon
+                                                    iconUrl: $response.Data.Marker.Type.Icon,
+                                                    id: $response.Data.Marker.ID
                                                 }
                                             });
 
                                             let MarkerReplace = L.marker([$response.Data.Marker.Latitude, $response.Data.Marker.Longitude],
                                                 {
-                                                    icon: new MarkerInfo(),
-                                                    highlight: "temporary"
+                                                    icon: new MarkerInfo()
                                                 }).bindPopup($response.Data.Marker.PopupContent);
 
 
                                             window[$response.Data.Marker.Type.MapName].addLayer(MarkerReplace);
+                                            drawnItems.addLayer(MarkerReplace);
+
                                             return;
                                         }
                                     }
@@ -423,6 +435,56 @@
         });
     }
 
+    function UpdateLocationMarker(raw) {
+        $.ajax({
+            type: "POST",
+            url: "Marker/UpdateLocation",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $(".loading-bar").show();
+            },
+            complete: function () {
+                $(".loading-bar").hide();
+            },
+            data: JSON.stringify(raw),
+            success: function (response) {
+                var $response = response;
+                if ($response.Success) {
+                    debugger;
+
+                    Toast.fire({
+                        icon: 'success',
+                        title: $response.Message
+                    });
+                }
+                else {
+                    Swal.fire({
+                        title: 'Notification',
+                        text: $response.Message,
+                        icon: 'error',
+                        confirmButtonText: 'Close'
+                    });
+                }
+            },
+            error: function (data) {
+                Swal.fire({
+                    title: 'Notification',
+                    text: 'Error when call api controller',
+                    icon: 'error',
+                    confirmButtonText: 'Close'
+                });
+            }
+        });
+    }
+
+    // #endregion Marker
+
+    // #region Polyline
+    function EditPolyline(idPolyline) {
+        GetPolyline(idPolyline, null, null, null);
+    }
+
+
     function GetPolyline(id, arrLatLngs, length , central) {
 
         let raw = {
@@ -458,8 +520,11 @@
 
                     $("#form-polyline-input-type").msDropdown({ roundedBorder: false });
 
-                    let modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-polyline')) // Returns a Bootstrap modal instance
-                    // Show or hide:
+                    collectionLatLngsLocal = arrLatLngs;
+
+                    SetValidFormPolyline();
+
+                    let modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-polyline'))
                     modal.show();
                 }
                 else {
@@ -469,6 +534,162 @@
         });
     }
 
+    function SetValidFormPolyline() {
+        $('#form-polyline-input').validate({
+            ignore: "",
+            rules: {
+                "form-polyline-input-type": {
+                    required: true,
+                },
+                "form-polyline-input-name": {
+                    required: true,
+                }
+            },
+            messages: {
+                "form-polyline-input-type": {
+                    required: "Type Polyline is invalid",
+                },
+                "form-polyline-input-name": {
+                    required: "Name marker is invalid",
+                }
+            },
+            invalidHandler: function (event, validator) {
+
+            },
+            submitHandler: function (form) {
+                let model = {
+                    ID: $('#form-polyline-input-id').val(),
+                    Name: $('#form-polyline-input-name').val(),
+                    CablineLength: $('#form-polyline-input-length').val(),
+                    CentralLatlng: $('#form-polyline-input-central').val(),
+                    TypeID: $('#form-polyline-input-type').val(),
+                    LatLongs : collectionLatLngsLocal
+                }
+
+                let url = '/Polyline/UpdateInfor';
+                if (model.ID == null || model.ID == '') {
+                    url = '/Polyline/Create';
+                }
+
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    contentType: "application/json; charset=utf-8",
+                    beforeSend: function () {
+                        $(".loading-bar").show();
+                    },
+                    complete: function () {
+                        $(".loading-bar").hide();
+                    },
+                    data: JSON.stringify(model),
+                    success: function (response) {
+                        var $response = response;
+                        if ($response.Success) {
+                            if (url == '/Polyline/Create') 
+                            {
+                                let inforPolyline = {
+                                    color: $response.Data.ColorLine,
+                                    weight: $response.Data.WeightLine
+                                };
+
+                                var polyline = L.polyline([$response.Data.OnlyLatLongs], inforPolyline);
+
+                                polyline.bindPopup($response.Data.PopupContent);
+
+                                window[$response.Data.MapName].addLayer(polyline);
+                                drawnItems.addLayer(polyline);
+
+                                let modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-polyline'))
+                                modal.hide();
+
+                                Toast.fire({
+                                   icon: 'success',
+                                   title: $response.Message
+                                });
+                                collectionLatLngsLocal = [];
+                            }
+                            else //Update case
+                            {
+                                //Remove Old
+                                let ArrLngs = $response.Latlngs;
+
+                                let LayerLngs = [];
+
+                                ArrLngs.forEach(function (item) {
+                                    let itemInject = {
+                                        lat: item.lat,
+                                        lng: item.lng
+                                    };
+                                    LayerLngs.push(itemInject);
+                                });
+
+                                window[$response.OldMapLayer].eachLayer(function (layer) {
+                                    debugger;
+                                    if (JSON.stringify(layer._latlngs) == JSON.stringify([LayerLngs])) {
+                                        window[$response.OldMapLayer].removeLayer(layer);
+                                        return;
+                                    }
+                                });
+
+                                //Replace Layer
+
+                                let InforCabline = {
+                                    color: $response.MapLayer.ColorLine,
+                                    weight: $response.MapLayer.WeightLine
+                                };
+
+                                let polyline = L.polyline([$response.Latlngs], InforCabline);
+
+                                polyline.bindPopup($response.PopupContent);
+
+                                window[$response.MapLayer.MapName].addLayer(polyline);
+
+                                window[$response.MapLayer.MapName].on('mouseover', function (e) {
+                                    var layer = e.layer;
+                                    layer.setStyle({
+                                        color: 'blue',
+                                        opacity: 1,
+                                        weight: 10
+                                    });
+                                });
+
+                                window[$response.MapLayer.MapName].on('mouseout', function (e) {
+                                    var layer = e.layer;
+                                    layer.setStyle(InforCabline);
+                                });
+
+
+                                Toast.fire({
+                                    icon: 'success',
+                                    title: $response.Message
+                                });
+                                collectionLatLngsLocal = [];
+                            }
+                        }
+                        else {
+                            Swal.fire({
+                                title: 'Notification',
+                                text: $response.Message,
+                                icon: 'error',
+                                confirmButtonText: 'Close'
+                            });
+                        }
+                    },
+                    error: function (data) {
+                        Swal.fire({
+                            title: 'Notification',
+                            text: 'Error when call api controller',
+                            icon: 'error',
+                            confirmButtonText: 'Close'
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    // #endregion Polyline
+
     function getLayerType(layer) {
         var layerType = "";
 
@@ -477,6 +698,9 @@
         }
         else if (layer instanceof L.Polyline) {
             layerType = "Polyline";
+        }
+        else if (layer instanceof L.Polygon) {
+            layerType = "Polygon";
         }
         return layerType;
     };
@@ -522,6 +746,7 @@
     };
 
     window.onload = function () {
+
         $.ajax({
             type: "GET",
             beforeSend: function () {
@@ -546,16 +771,16 @@
                     }
 
                     L.control.layers({
-                        "OpenStreet Map": osm.addTo(map),
-                        "Google Map": googleStreets,
+                        "Google Map": googleStreets.addTo(map),
+                        "OpenStreet Map": osm,
                         "The free size map": mapWord
                     }, paramsJson, { position: 'topleft', collapsed: false }).addTo(map);
 
-                    let drawnItems = L.featureGroup().addTo(map);
 
                     map.addControl(new L.Control.Draw({
                         edit: {
                             featureGroup: drawnItems,
+                            remove: false ,
                             poly: {
                                 allowIntersection: false
                             }
@@ -571,13 +796,10 @@
                                     weight: 7,
                                 }
                             }
-                        }
+                        },
                     }));
 
-
                     map.on(L.Draw.Event.CREATED, function (event) {
-                        //drawnItems.addLayer(layer);
-
                         debugger;
                         var layer = event.layer,
                             layerType = getLayerType(layer);
@@ -614,6 +836,27 @@
                     });
 
 
+                    map.on(L.Draw.Event.EDITED, function (event) {
+                        debugger;
+                        var layer = Object.values(event.layers._layers)[0].editing;
+                            layerType = getLayerType(layer._marker);
+
+                        if (layerType === 'Marker') 
+                        {
+                            let latLng = Object.values(event.layers._layers)[0]._latlng;
+                            let idMarker = Object.values(event.layers._layers)[0].options.icon.options.id;
+
+                            let raw = {
+                                ID : idMarker,
+                                Lat : latLng.lat,
+                                Long: latLng.lng
+                            };
+
+                            UpdateLocationMarker(raw)
+                        }
+                    });
+
+                    //Markers
                     var Arr = $response.Data.Markers;
                     for (i = 0; i < Arr.length; i++) {
 
@@ -621,13 +864,32 @@
                             options: {
                                 iconAnchor: new L.Point(L.Draw.constants.anchorSize, L.Draw.constants.anchorSize),
                                 iconSize: new L.Point(L.Draw.constants.iconSize, L.Draw.constants.iconSize),
-                                iconUrl: Arr[i].IconType
-                            }
+                                iconUrl: Arr[i].IconType,
+                                id : Arr[i].ID
+                            },
                         });
 
-                        var mker = L.marker([Arr[i].Lat, Arr[i].Long], { icon: new MarkerDefine(), highlight: "temporary" });
+                        var mker = L.marker([Arr[i].Lat, Arr[i].Long], { icon: new MarkerDefine() });
                         mker.bindPopup(Arr[i].PopupContent);
                         window[Arr[i].MapName].addLayer(mker);
+
+                        drawnItems.addLayer(mker);
+                    }
+
+                    //Polylines
+                    var ArrCabline = $response.Data.Polylines;
+                    for (i = 0; i < ArrCabline.length; i++) 
+                    {
+                        let InforCabline = {
+                            color: ArrCabline[i].ColorLine,
+                            weight: ArrCabline[i].WeightLine
+                        };
+
+                        let polyline = L.polyline([ArrCabline[i].OnlyLatLongs], InforCabline);
+
+                        polyline.bindPopup(ArrCabline[i].PopupContent);
+                        window[ArrCabline[i].MapName].addLayer(polyline);
+                        drawnItems.addLayer(polyline);
                     }
                 }
                 else {

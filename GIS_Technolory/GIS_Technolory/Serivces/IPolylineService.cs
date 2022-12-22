@@ -24,11 +24,37 @@ namespace GIS_Technolory.Serivces
         {
             string typeName = string.Empty;
             typeName = _Context.TypePolylines.FirstOrDefault(x => x.ID.Equals(uploadRecord.TypeID)).Name;
-            uploadRecord.PopupContent = "<b>Name : " + uploadRecord.Name + "</b><br>"
-                                      + "<b>Type : " + typeName + "</b><br>"
-                                      + "<hr/>"
-                                      + "<center><button id='btnedit' value='' onclick='EditCabline(\"" + uploadRecord.ID + "\")' class='btn btn-default'>Edit</button>&nbsp;&nbsp;&nbsp;"
-                                      + "<button id='btndelete' value='' onclick='DeleteCabLine(\"" + uploadRecord.ID + "\")' class='btn btn-default'>Delete</button></center>";
+            uploadRecord.PopupContent = $@"<div style='width : 280px'>
+                                              <div class='row row_padding'>
+                                                  <div class='col-3 popup-title-lf'>
+                                                      <span class='sp-pup-tittle-lf'>Name</span>
+                                                  </div>
+                                                  <div class='col-9 css_bg_view'>
+                                                      <span>{uploadRecord.Name}</span>
+                                                  </div>
+                                               </div>
+                                               <div class='row row_padding'>
+                                                  <div class='col-3 popup-title-lf'>
+                                                      <span class='sp-pup-tittle-lf'>Type</span>
+                                                  </div>
+                                                  <div class='col-9 css_bg_view'>
+                                                      <span>{typeName}</span>
+                                                  </div>
+                                               </div>
+                                               <div class='row row_padding'>
+                                                  <div class='col-3 popup-title-lf'>
+                                                      <span class='sp-pup-tittle-lf'>Length</span>
+                                                  </div>
+                                                  <div class='col-9 css_bg_view'>
+                                                      <span>{uploadRecord.CablineLength}</span>
+                                                  </div>
+                                               </div>
+                                              <div class='swal2-actions'>
+                                                  <button onclick='EditPolyline(`{uploadRecord.ID}`)' class='swal2-confirm swal2-styled act-popup-leaflet'>Edit info</button>&nbsp;
+                                                  <button onclick='DeletePolyline(`{uploadRecord.ID}`)' class='swal2-deny swal2-styled'>Delete</button>
+                                              </div>
+                                            </div>
+                                          ";
 
 
             EntityEntry<Polyline> record = await _Context.AddAsync(uploadRecord);
@@ -54,13 +80,13 @@ namespace GIS_Technolory.Serivces
 
         public async Task<Polyline> Get(string id)
         {
-            return await _Context.Polylines.FirstOrDefaultAsync(x => x.ID.Equals(id));
+            return await _Context.Polylines.Include(x=>x.Type).Include(x=>x.LatLongs.OrderBy(x => x.Order)).FirstOrDefaultAsync(x => x.ID.Equals(id));
         }
 
         public async Task<IEnumerable<Polyline>> GetList(string name = null)
         {
             if (string.IsNullOrEmpty(name))
-                return await _Context.Polylines.ToListAsync();
+                return await _Context.Polylines.Include(x => x.Type).Include(x => x.LatLongs.OrderBy(x => x.Order)).ToListAsync();
             else
             {
                 string search = name.Trim().ToLower();
@@ -72,11 +98,37 @@ namespace GIS_Technolory.Serivces
         {
             string typeName = string.Empty;
             typeName = _Context.TypePolylines.FirstOrDefault(x => x.ID.Equals(uploadRecord.TypeID)).Name;
-            uploadRecord.PopupContent = "<b>Name : " + uploadRecord.Name + "</b><br>"
-                                      + "<b>Type : " + typeName + "</b><br>"
-                                      + "<hr/>"
-                                      + "<center><button id='btnedit' value='' onclick='EditCabline(\"" + uploadRecord.ID + "\")' class='btn btn-default'>Edit</button>&nbsp;&nbsp;&nbsp;"
-                                      + "<button id='btndelete' value='' onclick='DeleteCabLine(\"" + uploadRecord.ID + "\")' class='btn btn-default'>Delete</button></center>";
+            uploadRecord.PopupContent = $@"<div style='width : 280px'>
+                                              <div class='row row_padding'>
+                                                  <div class='col-3 popup-title-lf'>
+                                                      <span class='sp-pup-tittle-lf'>Name</span>
+                                                  </div>
+                                                  <div class='col-9 css_bg_view'>
+                                                      <span>{uploadRecord.Name}</span>
+                                                  </div>
+                                               </div>
+                                               <div class='row row_padding'>
+                                                  <div class='col-3 popup-title-lf'>
+                                                      <span class='sp-pup-tittle-lf'>Type</span>
+                                                  </div>
+                                                  <div class='col-9 css_bg_view'>
+                                                      <span>{typeName}</span>
+                                                  </div>
+                                               </div>
+                                               <div class='row row_padding'>
+                                                  <div class='col-3 popup-title-lf'>
+                                                      <span class='sp-pup-tittle-lf'>Length</span>
+                                                  </div>
+                                                  <div class='col-9 css_bg_view'>
+                                                      <span>{uploadRecord.CablineLength}</span>
+                                                  </div>
+                                               </div>
+                                              <div class='swal2-actions'>
+                                                  <button onclick='EditPolyline(`{uploadRecord.ID}`)' class='swal2-confirm swal2-styled act-popup-leaflet'>Edit info</button>&nbsp;
+                                                  <button onclick='DeletePolyline(`{uploadRecord.ID}`)' class='swal2-deny swal2-styled'>Delete</button>
+                                              </div>
+                                            </div>
+                                          ";
 
             EntityEntry<Polyline> record = _Context.Update(uploadRecord);
             int result = await _Context.SaveChangesAsync();
