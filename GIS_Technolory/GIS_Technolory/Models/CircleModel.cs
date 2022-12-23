@@ -18,10 +18,12 @@
 
         public float Opacity { get; set; }
 
-        public double Radius { get; set; }
+        public string Radius { get; set; }
 
         public string FillColor { get; set; }
 
         public float FillOpacity { get; set; }
+
+        public string Area { get; set; }
     }
 }

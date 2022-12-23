@@ -30,7 +30,8 @@ namespace GIS_Technolory.Entities
 
         public float Opacity { get; set; }
 
-        public double? Radius { get; set; }
+        [MaxLength(30)]
+        public string Radius { get; set; }
 
         public bool IsCircleMarker
         {
@@ -44,5 +45,8 @@ namespace GIS_Technolory.Entities
         public string FillColor { get; set; }
 
         public float FillOpacity { get; set; }
+
+        [MaxLength(30)]
+        public string Area { get; set; }
     }
 }

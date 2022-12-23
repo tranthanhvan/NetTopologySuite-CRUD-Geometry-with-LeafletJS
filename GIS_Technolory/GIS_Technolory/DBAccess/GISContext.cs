@@ -20,6 +20,7 @@ namespace GIS_Technolory.DBAccess
         public DbSet<Polyline> Polylines { get; set; }
         public DbSet<TypePolyline> TypePolylines { get; set; }
         public DbSet<PolylineLatLong> PolylineLatLongs { get; set; }
+        public DbSet<Circle> Circles { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options) => options.UseSqlServer(ConnectionService.connstring, x => x.UseNetTopologySuite()).LogTo(Console.WriteLine, LogLevel.Information);
     }
