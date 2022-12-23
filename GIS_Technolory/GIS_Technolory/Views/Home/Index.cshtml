@@ -939,6 +939,28 @@
                             
                             GetPolyline('', CablineLatlngsCU, lengthCabline, centralLatlngs);
                         }
+                        else if (layerType === 'Polygon') 
+                        {
+
+                        }
+                        else if (layerType === 'Circle') 
+                        {
+                            
+                        }
+                        else if (layerType === 'CircleMarker') 
+                        {
+                            let InforCircle = {
+                                color: "#DC143C",
+                                weight: 2,
+                                id: '123456789',
+                                opacity: 0.5
+                            };
+
+                            let cirlce = L.circle([layer._latlng.lat,layer._latlng.lng], InforCircle).addTo(map);
+                            cirlce._mRadius = 100;
+                            cirlce.bindPopup('hello world');
+                            drawnItems.addLayer(cirlce);
+                        }
 
                         console.log('Created layer:', layer);
                         console.log('Type: ', layerType);
@@ -947,51 +969,51 @@
 
 
                     map.on(L.Draw.Event.EDITED, function (event) {
-                        debugger;
-                        var layer = Object.values(event.layers._layers)[0].editing;
-                        //layerType = getLayerType(layer._marker);
+                        Object.values(event.layers._layers).forEach(function (item) {
+                            let layer = item.editing;
 
-                        if (typeof layer._marker !== 'undefined')  //Marker
-                        {
-                            let latLng = Object.values(event.layers._layers)[0]._latlng;
-                            let idMarker = Object.values(event.layers._layers)[0].options.icon.options.id;
+                            if (typeof layer._marker !== 'undefined')  //Marker
+                            {
+                                let latLng = Object.values(event.layers._layers)[0]._latlng;
+                                let idMarker = Object.values(event.layers._layers)[0].options.icon.options.id;
 
-                            let raw = {
-                                ID : idMarker,
-                                Lat : latLng.lat,
-                                Long: latLng.lng
-                            };
-                            UpdateLocationMarker(raw)
-                        }
-                        else if(typeof layer._poly !== 'undefined') {
-                            debugger;
-                            let idPolyline = layer._poly.options.id;
-                            let latLngs = layer._poly._latlngs;
-
-                            let centralLatlngs = layer._poly.getBounds().getCenter().lat + ',' + layer._poly.getBounds().getCenter().lng;
-
-                            let CablineLatlngsCU = [];
-                            let order = 1;
-                            latLngs[0].forEach(function (item) {
-                                let itemInject = {
-                                    Order: order,
-                                    Latitude: item.lat,
-                                    Longitude: item.lng
+                                let raw = {
+                                    ID: idMarker,
+                                    Lat: latLng.lat,
+                                    Long: latLng.lng
                                 };
-                                CablineLatlngsCU.push(itemInject);
-                                order++;
-                            });
-                            let lengthCabline = distance(latLngs[0]);
+                                UpdateLocationMarker(raw)
+                            }
+                            else if (typeof layer._poly !== 'undefined') {
+                                debugger;
+                                let idPolyline = layer._poly.options.id;
+                                let latLngs = layer._poly._latlngs;
 
-                            let raw = {
-                                ID : idPolyline,
-                                CablineLength : lengthCabline,
-                                CentralLatlng: centralLatlngs,
-                                LatLongs : CablineLatlngsCU
-                            };
+                                let centralLatlngs = layer._poly.getBounds().getCenter().lat + ',' + layer._poly.getBounds().getCenter().lng;
 
-                            UpdateLocationPolyline(raw)
-                        }
+                                let CablineLatlngsCU = [];
+                                let order = 1;
+                                latLngs[0].forEach(function (item) {
+                                    let itemInject = {
+                                        Order: order,
+                                        Latitude: item.lat,
+                                        Longitude: item.lng
+                                    };
+                                    CablineLatlngsCU.push(itemInject);
+                                    order++;
+                                });
+                                let lengthCabline = distance(latLngs[0]);
+
+                                let raw = {
+                                    ID: idPolyline,
+                                    CablineLength: lengthCabline,
+                                    CentralLatlng: centralLatlngs,
+                                    LatLongs: CablineLatlngsCU
+                                };
+
+                                UpdateLocationPolyline(raw)
+                            }
+                        });
                     });
 
                     //Markers
