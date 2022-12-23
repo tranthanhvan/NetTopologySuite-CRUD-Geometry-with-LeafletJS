@@ -941,11 +941,32 @@
                         }
                         else if (layerType === 'Polygon') 
                         {
+                            let InforPolygon= layer.options;
+                            InforPolygon.id = "123456789966";
+                            InforPolygon.color = "#3388ff";
+                            InforPolygon.opacity = 0.5;
+                            InforPolygon.weight = 2;
+                            InforPolygon.fillColor = 'red';
+                            InforPolygon.fillOpacity = 0.5;
+
+                            let polygon = L.polygon([layer._latlngs[0]], InforPolygon).addTo(map);
+                            polygon.bindPopup('hello world');
+                            drawnItems.addLayer(polygon);
 
                         }
                         else if (layerType === 'Circle') 
                         {
-                            
+                            let InforCircle = layer.options;
+                            InforCircle.id = "123456789966";
+                            InforCircle.color = "#3388ff";
+                            InforCircle.opacity = 0.5;
+                            InforCircle.weight = 2;
+                            InforCircle.fillColor = 'red';
+                            InforCircle.fillOpacity = 0.5;
+
+                            let cirlce = L.circle([layer._latlng.lat,layer._latlng.lng], InforCircle).addTo(map);
+                            cirlce.bindPopup('hello world');
+                            drawnItems.addLayer(cirlce);
                         }
                         else if (layerType === 'CircleMarker') 
                         {
@@ -953,11 +974,12 @@
                                 color: "#DC143C",
                                 weight: 2,
                                 id: '123456789',
-                                opacity: 0.5
+                                opacity: 0.5,
+                                fillColor : 'green',
+                                fillOpacity : 0.5
                             };
 
-                            let cirlce = L.circle([layer._latlng.lat,layer._latlng.lng], InforCircle).addTo(map);
-                            cirlce._mRadius = 100;
+                            let cirlce = L.circleMarker([layer._latlng.lat,layer._latlng.lng], InforCircle).addTo(map);
                             cirlce.bindPopup('hello world');
                             drawnItems.addLayer(cirlce);
                         }

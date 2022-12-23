@@ -30,6 +30,19 @@ namespace GIS_Technolory.Entities
 
         public float Opacity { get; set; }
 
-        public int Radius { get; set; }
+        public double? Radius { get; set; }
+
+        public bool IsCircleMarker
+        {
+            get => Radius == null;
+        }
+
+        /// <summary>
+        /// Color inside Circle
+        /// </summary>
+        [MaxLength(10)]
+        public string FillColor { get; set; }
+
+        public float FillOpacity { get; set; }
     }
 }

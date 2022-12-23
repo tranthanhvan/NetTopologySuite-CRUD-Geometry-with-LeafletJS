@@ -53,5 +53,13 @@ namespace GIS_Technolory.Entities
         public float Opacity { get; set; }
 
         public NetTopologySuite.Geometries.Polygon Location { get; set; }
+
+        /// <summary>
+        /// Color inside Circle
+        /// </summary>
+        [MaxLength(10)]
+        public string FillColor { get; set; }
+
+        public float FillOpacity { get; set; }
     }
 }
