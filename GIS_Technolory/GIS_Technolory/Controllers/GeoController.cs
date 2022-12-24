@@ -1,4 +1,5 @@
-﻿using GIS_Technolory.Entities;
+﻿using GIS_Technolory.Constants;
+using GIS_Technolory.Entities;
 using GIS_Technolory.Models;
 using GIS_Technolory.Response;
 using GIS_Technolory.Serivces;
@@ -12,13 +13,15 @@ namespace GIS_Technolory.Controllers
         private readonly IPolylineService _polylineService;
         private readonly ITypeMarkerService _typeMarkerService;
         private readonly ITypePolylineService _typePolylineService;
+        private readonly ICircleService _CircleService;
 
-        public GeoController(IMarkerService markerService, IPolylineService polylineService, ITypeMarkerService typeMarkerService, ITypePolylineService typePolylineService)
+        public GeoController(IMarkerService markerService, IPolylineService polylineService, ITypeMarkerService typeMarkerService, ITypePolylineService typePolylineService, ICircleService CircleService)
         {
             _markerService = markerService;
             _polylineService = polylineService;
             _typeMarkerService = typeMarkerService;
             _typePolylineService = typePolylineService;
+            _CircleService = CircleService;
         }
 
         [HttpGet]
@@ -40,10 +43,29 @@ namespace GIS_Technolory.Controllers
                     Name = x.Name,
                     MapName = x.MapName
                 }));
+                typeSelect.Add(new { Name = TypeCircleConst.Circle, MapName = MapLayerCircleConst.Circle });
+                typeSelect.Add(new { Name = TypeCircleConst.CircleMarker, MapName = MapLayerCircleConst.CircleMarker });
                 #endregion Type Maps
 
                 IEnumerable<Marker> markers = await _markerService.GetList();
                 IEnumerable<Polyline> polylines = await _polylineService.GetList();
+
+                IEnumerable<Circle> allCircles = await _CircleService.GetList();
+                IEnumerable<CircleModel> allCirlceModel = allCircles.Select(x => new CircleModel()
+                {
+                    ID = x.ID,
+                    Name = x.Name,
+                    PopupContent = x.PopupContent,
+                    Latitude = x.Latitude,
+                    Longitude = x.Longitude,
+                    ColorCircle = x.ColorCircle,
+                    WeightBorder = x.WeightBorder,
+                    Opacity = x.Opacity,
+                    Radius = x.Radius,
+                    FillColor = x.FillColor,
+                    FillOpacity = x.FillOpacity
+                });
+
 
                 response.Success = true;
                 response.Data = new
@@ -76,7 +98,9 @@ namespace GIS_Technolory.Controllers
                             Longitude = c.Longitude,
                             Order = c.Order
                         }).ToList()
-                    })
+                    }),
+                    Circles = allCircles.Where(x=>!x.IsCircleMarker),
+                    CircleMarkers = allCircles.Where(x => x.IsCircleMarker)
                 };
             }
             catch (Exception ex)

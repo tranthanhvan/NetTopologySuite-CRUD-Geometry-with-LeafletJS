@@ -1,0 +1,101 @@
+﻿@model CircleModel;
+
+
+<form id="form-circle-input" name="form-circle-input">
+    <input type="text" id="form-circle-input-id" maxlength="250" class="form-control" value="@Model.ID" hidden />
+    <input type="text" id="form-circle-input-radius" maxlength="250" class="form-control" value="@Model.Radius" hidden />
+    <div class="row padding-form">
+        <div class="col-md-4">
+            <label>Type circle :</label>
+        </div>
+        <div class="col-md-8">
+            <input type="text" value="@Model.MapLayerName" class="form-control" readonly/>
+        </div>
+    </div>
+    <div class="row padding-form">
+        <div class="col-md-4">
+            <label>Name :</label>
+        </div>
+        <div class="col-md-8">
+            <input type="text" id="form-circle-input-name" name="form-circle-input-name" maxlength="250" class="form-control" value="@Model.Name" />
+        </div>
+    </div>
+
+    <div class="row padding-form">
+        <div class="col-md-4">
+            <label>Lat :</label>
+        </div>
+        <div class="col-md-8">
+            <input type="text" id="form-circle-input-lat" name="form-circle-input-lat" maxlength="50" class="form-control" value="@Model.Latitude" readonly />
+        </div>
+    </div>
+
+    <div class="row padding-form">
+        <div class="col-md-4">
+            <label>Long :</label>
+        </div>
+        <div class="col-md-8">
+            <input type="text" id="form-circle-input-long" name="form-circle-input-long" maxlength="50" class="form-control" value="@Model.Longitude" readonly />
+        </div>
+    </div>
+
+    <div class="row padding-form">
+        <div class="col-md-4">
+            <label>Color Circle :</label>
+        </div>
+        <div class="col-md-2">
+            <input type="color" id="form-circle-input-color-circle" name="form-circle-input-color-circle" value="@Model.ColorCircle" />
+        </div>
+        <div class="col-md-4">
+            <label>Weight Border :</label>
+        </div>
+        <div class="col-md-2">
+            <input type="number" id="form-circle-input-color-weight-border" class="form-control" name="form-circle-input-color-weight-border" value="@Model.WeightBorder" />
+        </div>
+    </div>
+
+
+    <div class="row padding-form">
+        <div class="col-md-4">
+            <label>Opacity :</label>
+        </div>
+        <div class="col-md-3">
+            <input type="number" id="form-circle-input-opacity" step="0.1" class="form-control" name="form-circle-input-opacity" value="@Model.Opacity" />
+        </div>
+        @if(!string.IsNullOrEmpty(Model.DisplayRadius)) 
+        {
+            <div class="col-md-2">
+                <label>Radius :</label>
+            </div>
+            <div class="col-md-3">
+                <input type="text" id="form-circle-display-radius" class="form-control" name="form-circle-display-radius" value="@Model.DisplayRadius" readonly/>
+            </div>
+        }
+    </div>
+
+    <div class="row padding-form">
+        <div class="col-md-4">
+            <label>Fill color :</label>
+        </div>
+        <div class="col-md-2">
+            <input type="color" id="form-circle-input-fill-color" name="form-circle-input-fill-color" value="@Model.FillColor" />
+        </div>
+        <div class="col-md-3">
+            <label>Fill opacity :</label>
+        </div>
+        <div class="col-md-3">
+            <input type="number" step="0.1" id="form-circle-input-fill-opacity" class="form-control" name="form-circle-input-fill-opacity" value="@Model.FillOpacity" />
+        </div>
+    </div>
+
+    @if(!string.IsNullOrEmpty(Model.Area)) {
+        <div class="row padding-form">
+            <div class="col-md-4">
+                <label>Area :</label>
+            </div>
+            <div class="col-md-8">
+                <input type="text" id="form-circle-display-area" name="form-circle-display-area" maxlength="50" class="form-control" value="@Model.Area" readonly />
+            </div>
+        </div>
+    }
+</form>

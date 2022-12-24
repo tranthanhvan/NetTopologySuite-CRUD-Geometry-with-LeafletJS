@@ -125,6 +125,24 @@
     </div>
 </div>
 
+<div class="modal fade" id="modal-circle" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Cirlce detail</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="container-modal-body-circle">
+
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" form="form-circle-input">Save changes</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script type="text/javascript">
 
     var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -370,7 +388,7 @@
                             }
                             else //Update case
                             {
-                                map.eachLayer(function (layer) {
+                                window[$response.Data.OldMap].eachLayer(function (layer) {
 
                                     if (typeof (layer._latlng) == "undefined") {
 
@@ -794,6 +812,209 @@
 
     // #endregion Polyline
 
+    // #region Cirlce
+
+    function GetCircle(id, lat, long , radius , callBack) {
+        let raw = {
+            ID: id,
+            Latitude: 0,
+            Longitude: 0,
+            Radius: 0
+        };
+
+        if (raw.ID == null || raw.ID == '') {
+            raw.Latitude = lat;
+            raw.Longitude = long;
+            raw.Radius = radius;
+        }
+
+        $.ajax({
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $(".loading-bar").show();
+            },
+            complete: function () {
+                $(".loading-bar").hide();
+            },
+            url: "/Circle/GetCircle",
+            data: JSON.stringify(raw),
+            success: function (response) {
+                var $response = response;
+                if ($response.Success == true) {
+
+                    $("#container-modal-body-circle").html("");
+                    $("#container-modal-body-circle").html($response.Data);
+                    SetValidFormCircle(callBack);
+
+                    let modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-circle'));
+                    modal.show();
+                }
+                else {
+                    alert('error when get data');
+                }
+            }
+        });
+    }
+
+    ///Use after Save cirlce to get option info
+    function GetCircleInstance(layer) {
+        return layer;
+    }
+
+    function EditCircle(id)
+    {
+        GetCircle(id, null, null, null, null);
+    }
+
+    function SetValidFormCircle(callBack) {
+        $('#form-circle-input').validate({
+            ignore: "",
+            rules: {
+                "form-circle-input-name": {
+                    required: true,
+                },
+                "form-circle-input-color-weight-border": {
+                    required: true,
+                },
+                "form-circle-input-opacity": {
+                    required: true,
+                },
+                "form-circle-input-fill-opacity": {
+                    required: true,
+                }
+            },
+            messages: {
+                "form-circle-input-name": {
+                    required: "Name circle is invalid",
+                },
+                "form-circle-input-color-weight-border": {
+                    required: "weight border circle is invalid",
+                },
+                "form-circle-input-opacity": {
+                    required: "opacity circle is invalid",
+                },
+                "form-circle-input-fill-opacity": {
+                    required: "opacity fill circle is invalid",
+                },
+            },
+            invalidHandler: function (event, validator) {
+
+            },
+            submitHandler: function (form) {
+
+                let model = {
+                    ID: $('#form-circle-input-id').val(),
+                    Name: $('#form-circle-input-name').val(),
+                    Latitude: $('#form-circle-input-lat').val(),
+                    Longitude: $('#form-circle-input-long').val(),
+                    WeightBorder: $('#form-circle-input-color-weight-border').val(),
+                    Radius: $('#form-circle-input-radius').val(),
+                    ColorCircle:$('#form-circle-input-color-circle').val(),
+                    FillColor :$('#form-circle-input-fill-color').val(),
+                    Opacity :$('#form-circle-input-opacity').val(),
+                    FillOpacity :$('#form-circle-input-fill-opacity').val()
+                }
+
+                let url = '/Circle/UpdateInfor';
+                if (model.ID == null || model.ID == '') {
+                    url = '/Circle/Create';
+                }
+
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    contentType: "application/json; charset=utf-8",
+                    beforeSend: function () {
+                        $(".loading-bar").show();
+                    },
+                    complete: function () {
+                        $(".loading-bar").hide();
+                    },
+                    data: JSON.stringify(model),
+                    success: function (response) {
+                        debugger;
+                        var $response = response;
+                        if ($response.Success) {
+                            if (url == '/Circle/Create') {
+
+                                let inforCircle = callBack;
+                                inforCircle.id = $response.Data.ID;
+                                inforCircle.color = $response.Data.ColorCircle;
+                                inforCircle.opacity = $response.Data.Opacity;
+                                inforCircle.weight = $response.Data.WeightBorder;
+                                inforCircle.fillColor = $response.Data.FillColor;
+                                inforCircle.fillOpacity = $response.Data.FillOpacity;
+
+                                if($response.Data.Type == 'Circle') {
+                                    let cirlce = L.circle([$response.Data.Latitude,$response.Data.Longitude], inforCircle);
+                                    cirlce.bindPopup($response.Data.PopupContent);
+                                    window[$response.Data.MapLayer].addLayer(cirlce);
+                                    drawnItems.addLayer(cirlce);
+                                }
+                                else {
+                                    let cirlceMarker = L.circleMarker([$response.Data.Latitude,$response.Data.Longitude], inforCircle);
+                                    cirlceMarker.bindPopup($response.Data.PopupContent);
+                                    window[$response.Data.MapLayer].addLayer(cirlceMarker);
+                                    drawnItems.addLayer(cirlceMarker);
+                                }
+                            }
+                            else //Update case
+                            {
+                                window[$response.Data.MapLayer].eachLayer(function (layer) {
+                                    if (layer._latlng.lat == $response.Data.Latitude && layer._latlng.lng == $response.Data.Longitude) {
+                                        layer.options.color = $response.Data.ColorCircle;
+                                        layer.options.opacity = $response.Data.Opacity;
+                                        layer.options.weight = $response.Data.WeightBorder;
+                                        layer.options.fillColor = $response.Data.FillColor;
+                                        layer.options.fillOpacity = $response.Data.FillOpacity;
+                                        layer.bindPopup($response.Data.PopupContent);
+
+                                        let cloneReplace = layer; //because for some reason changing the options doesn't work
+
+                                        window[$response.Data.MapLayer].removeLayer(layer); //Remove old 
+                                        drawnItems.removeLayer(layer);
+
+                                        window[$response.Data.MapLayer].addLayer(cloneReplace); //Add clone
+                                        drawnItems.addLayer(cloneReplace);
+
+                                        return;
+                                    }
+                                });
+                            }
+
+                            Toast.fire({
+                                    icon: 'success',
+                                    title: $response.Message
+                            });
+
+                            let modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-circle'))
+                            modal.hide();
+                        }
+                        else {
+                            Swal.fire({
+                                title: 'Notification',
+                                text: $response.Message,
+                                icon: 'error',
+                                confirmButtonText: 'Close'
+                            });
+                        }
+                    },
+                    error: function (data) {
+                        Swal.fire({
+                            title: 'Notification',
+                            text: 'Error when call api controller',
+                            icon: 'error',
+                            confirmButtonText: 'Close'
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    // #endregion Circle
+
     function getLayerType(layer) {
         var layerType = "";
 
@@ -957,31 +1178,12 @@
                         else if (layerType === 'Circle') 
                         {
                             let InforCircle = layer.options;
-                            InforCircle.id = "123456789966";
-                            InforCircle.color = "#3388ff";
-                            InforCircle.opacity = 0.5;
-                            InforCircle.weight = 2;
-                            InforCircle.fillColor = 'red';
-                            InforCircle.fillOpacity = 0.5;
-
-                            let cirlce = L.circle([layer._latlng.lat,layer._latlng.lng], InforCircle).addTo(map);
-                            cirlce.bindPopup('hello world');
-                            drawnItems.addLayer(cirlce);
+                            GetCircle('', layer._latlng.lat, layer._latlng.lng, InforCircle.radius, GetCircleInstance(InforCircle));
                         }
                         else if (layerType === 'CircleMarker') 
                         {
-                            let InforCircle = {
-                                color: "#DC143C",
-                                weight: 2,
-                                id: '123456789',
-                                opacity: 0.5,
-                                fillColor : 'green',
-                                fillOpacity : 0.5
-                            };
-
-                            let cirlce = L.circleMarker([layer._latlng.lat,layer._latlng.lng], InforCircle).addTo(map);
-                            cirlce.bindPopup('hello world');
-                            drawnItems.addLayer(cirlce);
+                            let inforCircleMarker = layer.options;
+                            GetCircle('', layer._latlng.lat, layer._latlng.lng, 'NaN', GetCircleInstance(inforCircleMarker))
                         }
 
                         console.log('Created layer:', layer);
@@ -1073,6 +1275,44 @@
                         polyline.bindPopup(ArrCabline[i].PopupContent);
                         window[ArrCabline[i].MapName].addLayer(polyline);
                         drawnItems.addLayer(polyline);
+                    }
+
+                    var ArrCircles = $response.Data.Circles;
+                    for (i = 0; i < ArrCircles.length; i++) 
+                    {
+                        let inforCircle = {
+                            id : ArrCircles[i].ID,
+                            color : ArrCircles[i].ColorCircle,
+                            opacity : ArrCircles[i].Opacity,
+                            weight : ArrCircles[i].WeightBorder,
+                            fillColor : ArrCircles[i].FillColor,
+                            fillOpacity : ArrCircles[i].FillOpacity,
+                            radius : ArrCircles[i].Radius
+                        }
+                        
+                        let cirlce = L.circle([ArrCircles[i].Latitude,ArrCircles[i].Longitude], inforCircle);
+                        cirlce.bindPopup(ArrCircles[i].PopupContent);
+                        window[ArrCircles[i].MapLayer].addLayer(cirlce);
+                        drawnItems.addLayer(cirlce);
+                    }
+
+
+                    var ArrCircleMarkers = $response.Data.CircleMarkers;
+                    for (i = 0; i < ArrCircleMarkers.length; i++) 
+                    {
+                        let infor = {
+                            id : ArrCircleMarkers[i].ID,
+                            color : ArrCircleMarkers[i].ColorCircle,
+                            opacity : ArrCircleMarkers[i].Opacity,
+                            weight : ArrCircleMarkers[i].WeightBorder,
+                            fillColor : ArrCircleMarkers[i].FillColor,
+                            fillOpacity : ArrCircleMarkers[i].FillOpacity
+                        }
+                        
+                        let cirlceMarker = L.circleMarker([ArrCircleMarkers[i].Latitude,ArrCircleMarkers[i].Longitude], infor);
+                        cirlceMarker.bindPopup(ArrCircleMarkers[i].PopupContent);
+                        window[ArrCircleMarkers[i].MapLayer].addLayer(cirlceMarker);
+                        drawnItems.addLayer(cirlceMarker);
                     }
                 }
                 else {

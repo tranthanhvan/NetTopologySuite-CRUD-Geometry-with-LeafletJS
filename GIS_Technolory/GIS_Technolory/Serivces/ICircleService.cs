@@ -21,37 +21,55 @@ namespace GIS_Technolory.Serivces
     {
         public async Task<Circle> Create(Circle uploadRecord)
         {
+            string infoCicrle = string.Empty;
+            if(!uploadRecord.IsCircleMarker)
+            {
+                infoCicrle = @$"<div class='row row_padding'>
+                                    <div class='col-3 popup-title-lf'>
+                                        <span class='sp-pup-tittle-lf'>Radius</span>
+                                    </div>
+                                    <div class='col-9 css_bg_view'>
+                                        <span>{uploadRecord.DisplayRadius}</span>
+                                    </div>
+                                </div>
+                                <div class='row row_padding'>
+                                    <div class='col-3 popup-title-lf'>
+                                        <span class='sp-pup-tittle-lf'>Area</span>
+                                    </div>
+                                    <div class='col-9 css_bg_view'>
+                                        <span>{uploadRecord.Area}</span>
+                                    </div>
+                                 </div>";
+            }
+            else
+            {
+                uploadRecord.Radius = 0;
+            }
+
             uploadRecord.PopupContent = $@"<div style='width : 280px'>
-                                              <div class='row row_padding'>
-                                                  <div class='col-3 popup-title-lf'>
-                                                      <span class='sp-pup-tittle-lf'>Name</span>
-                                                  </div>
-                                                  <div class='col-9 css_bg_view'>
-                                                      <span>{uploadRecord.Name}</span>
-                                                  </div>
-                                               </div>
-                                               <div class='row row_padding'>
-                                                  <div class='col-3 popup-title-lf'>
-                                                      <span class='sp-pup-tittle-lf'>Radius</span>
-                                                  </div>
-                                                  <div class='col-9 css_bg_view'>
-                                                      <span>{uploadRecord.Radius}</span>
-                                                  </div>
-                                               </div>
-                                                <div class='row row_padding'>
-                                                  <div class='col-3 popup-title-lf'>
-                                                      <span class='sp-pup-tittle-lf'>Area</span>
-                                                  </div>
-                                                  <div class='col-9 css_bg_view'>
-                                                      <span>{uploadRecord.Area}</span>
-                                                  </div>
-                                               </div>
-                                              <div class='swal2-actions'>
-                                                  <button onclick='EditCircle(`{uploadRecord.ID}`)' class='swal2-confirm swal2-styled act-popup-leaflet'>Edit info</button>&nbsp;
-                                                  <button onclick='DeleteCircle(`{uploadRecord.ID}`)' class='swal2-deny swal2-styled'>Delete</button>
-                                              </div>
-                                            </div>
-                                          ";
+                                             <div class='row row_padding'>
+                                                <div class='col-3 popup-title-lf'>
+                                                    <span class='sp-pup-tittle-lf'>Name</span>
+                                                </div>
+                                                <div class='col-9 css_bg_view'>
+                                                    <span>{uploadRecord.Name}</span>
+                                                </div>
+                                             </div>
+                                             <div class='row row_padding'>
+                                                <div class='col-3 popup-title-lf'>
+                                                    <span class='sp-pup-tittle-lf'>Type</span>
+                                                </div>
+                                                <div class='col-9 css_bg_view'>
+                                                    <span>{uploadRecord.Type}</span>
+                                                </div>
+                                             </div>
+                                             {infoCicrle}
+                                             <div class='swal2-actions'>
+                                                 <button onclick='EditCircle(`{uploadRecord.ID}`)' class='swal2-confirm swal2-styled act-popup-leaflet'>Edit info</button>&nbsp;
+                                                 <button onclick='DeleteCircle(`{uploadRecord.ID}`)' class='swal2-deny swal2-styled'>Delete</button>
+                                             </div>
+                                           </div>";
+
             EntityEntry<Circle> record = await _Context.AddAsync(uploadRecord);
             int result = await _Context.SaveChangesAsync();
             if (result == 1)
@@ -91,37 +109,50 @@ namespace GIS_Technolory.Serivces
 
         public async Task<Circle> Update(Circle uploadRecord)
         {
+            string infoCicrle = string.Empty;
+            if (!uploadRecord.IsCircleMarker)
+            {
+                infoCicrle = @$"<div class='row row_padding'>
+                                    <div class='col-3 popup-title-lf'>
+                                        <span class='sp-pup-tittle-lf'>Radius</span>
+                                    </div>
+                                    <div class='col-9 css_bg_view'>
+                                        <span>{uploadRecord.DisplayRadius}</span>
+                                    </div>
+                                </div>
+                                <div class='row row_padding'>
+                                    <div class='col-3 popup-title-lf'>
+                                        <span class='sp-pup-tittle-lf'>Area</span>
+                                    </div>
+                                    <div class='col-9 css_bg_view'>
+                                        <span>{uploadRecord.Area}</span>
+                                    </div>
+                                 </div>";
+            }
+
             uploadRecord.PopupContent = $@"<div style='width : 280px'>
-                                              <div class='row row_padding'>
-                                                  <div class='col-3 popup-title-lf'>
-                                                      <span class='sp-pup-tittle-lf'>Name</span>
-                                                  </div>
-                                                  <div class='col-9 css_bg_view'>
-                                                      <span>{uploadRecord.Name}</span>
-                                                  </div>
-                                               </div>
-                                               <div class='row row_padding'>
-                                                  <div class='col-3 popup-title-lf'>
-                                                      <span class='sp-pup-tittle-lf'>Radius</span>
-                                                  </div>
-                                                  <div class='col-9 css_bg_view'>
-                                                      <span>{uploadRecord.Radius}</span>
-                                                  </div>
-                                               </div>
-                                                <div class='row row_padding'>
-                                                  <div class='col-3 popup-title-lf'>
-                                                      <span class='sp-pup-tittle-lf'>Area</span>
-                                                  </div>
-                                                  <div class='col-9 css_bg_view'>
-                                                      <span>{uploadRecord.Area}</span>
-                                                  </div>
-                                               </div>
-                                              <div class='swal2-actions'>
-                                                  <button onclick='EditCircle(`{uploadRecord.ID}`)' class='swal2-confirm swal2-styled act-popup-leaflet'>Edit info</button>&nbsp;
-                                                  <button onclick='DeleteCircle(`{uploadRecord.ID}`)' class='swal2-deny swal2-styled'>Delete</button>
-                                              </div>
-                                            </div>
-                                          ";
+                                             <div class='row row_padding'>
+                                                <div class='col-3 popup-title-lf'>
+                                                    <span class='sp-pup-tittle-lf'>Name</span>
+                                                </div>
+                                                <div class='col-9 css_bg_view'>
+                                                    <span>{uploadRecord.Name}</span>
+                                                </div>
+                                             </div>
+                                             <div class='row row_padding'>
+                                                <div class='col-3 popup-title-lf'>
+                                                    <span class='sp-pup-tittle-lf'>Type</span>
+                                                </div>
+                                                <div class='col-9 css_bg_view'>
+                                                    <span>{uploadRecord.Type}</span>
+                                                </div>
+                                             </div>
+                                             {infoCicrle}
+                                             <div class='swal2-actions'>
+                                                 <button onclick='EditCircle(`{uploadRecord.ID}`)' class='swal2-confirm swal2-styled act-popup-leaflet'>Edit info</button>&nbsp;
+                                                 <button onclick='DeleteCircle(`{uploadRecord.ID}`)' class='swal2-deny swal2-styled'>Delete</button>
+                                             </div>
+                                           </div>";
 
             EntityEntry<Circle> record = _Context.Update(uploadRecord);
             int result = await _Context.SaveChangesAsync();

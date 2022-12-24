@@ -37,6 +37,7 @@ namespace GIS_Technolory.Entities
             get => Location.Length;
         }
 
+        [NotMapped]
         /// <summary>
         /// Returns the area of this 
         /// </summary>

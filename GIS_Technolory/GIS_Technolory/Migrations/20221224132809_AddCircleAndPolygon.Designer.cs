@@ -3,6 +3,7 @@ using GIS_Technolory.DBAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 
@@ -11,9 +12,11 @@ using NetTopologySuite.Geometries;
 namespace GISTechnolory.Migrations
 {
     [DbContext(typeof(GISContext))]
-    partial class GISContextModelSnapshot : ModelSnapshot
+    [Migration("20221224132809_AddCircleAndPolygon")]
+    partial class AddCircleAndPolygon
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

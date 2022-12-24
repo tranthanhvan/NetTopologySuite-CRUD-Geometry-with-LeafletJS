@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using NetTopologySuite.Geometries;
+using GIS_Technolory.Constants;
 
 namespace GIS_Technolory.Entities
 {
@@ -30,13 +31,7 @@ namespace GIS_Technolory.Entities
 
         public float Opacity { get; set; }
 
-        [MaxLength(30)]
-        public string Radius { get; set; }
-
-        public bool IsCircleMarker
-        {
-            get => Radius == null;
-        }
+        public double Radius { get; set; } = double.NaN;
 
         /// <summary>
         /// Color inside Circle
@@ -46,7 +41,61 @@ namespace GIS_Technolory.Entities
 
         public float FillOpacity { get; set; }
 
-        [MaxLength(30)]
-        public string Area { get; set; }
+        [NotMapped]
+        public bool IsCircleMarker
+        {
+            get => double.IsNaN(Radius) || Radius == 0;
+        }
+
+        [NotMapped]
+        public string DisplayRadius
+        {
+            get
+            {
+                if (double.IsNaN(Radius) || Radius == 0)
+                    return string.Empty;
+                else if (Radius >= 1000)
+                {
+                    double Kilometer = Radius / 1000;
+                    return string.Format("{0:0.00}km", Kilometer);
+                }
+                else
+                    return string.Format("{0:0.00}m", Radius);
+            }
+        }
+
+        [NotMapped]
+        public string Area
+        {
+            get
+            {
+                if (double.IsNaN(Radius) || Radius == 0)
+                    return string.Empty;
+                else
+                {
+                    double area = Math.PI * Radius * Radius;
+                    if (area >= 1000)
+                    {
+                        double kilometer = area / 1000;
+                        return string.Format("{0:0.00}km²", kilometer);
+                    }
+                    else
+                    {
+                        return string.Format("{0:0.00}m²", area);
+                    }
+                }
+            }
+        }
+        [NotMapped]
+        public string Type
+        {
+            get => IsCircleMarker ? TypeCircleConst.CircleMarker : TypeCircleConst.Circle;
+        }
+
+        [NotMapped]
+        public string MapLayer
+        {
+            get => IsCircleMarker ? MapLayerCircleConst.CircleMarker : MapLayerCircleConst.Circle;
+        }
     }
 }
