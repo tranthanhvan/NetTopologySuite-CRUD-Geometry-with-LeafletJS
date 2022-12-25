@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using GIS_Technolory.Constants;
+using GIS_Technolory.Models;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GIS_Technolory.Entities
@@ -25,7 +27,7 @@ namespace GIS_Technolory.Entities
         [NotMapped]
         public int NumPoints
         {
-            get => Location.NumPoints;
+            get => LatLngs.Count;
         }
 
         /// <summary>
@@ -46,6 +48,16 @@ namespace GIS_Technolory.Entities
             get => Location.Area;
         }
 
+        [NotMapped]
+        public List<LatLongModel> LatLngs
+        {
+            get => Location.Coordinates.Distinct().Select(x => new LatLongModel()
+            {
+                lat = x.CoordinateValue.Y,
+                lng = x.CoordinateValue.X
+            }).ToList();
+        }
+
         [MaxLength(10)]
         public string Color { get; set; }
 
@@ -62,5 +74,51 @@ namespace GIS_Technolory.Entities
         public string FillColor { get; set; }
 
         public float FillOpacity { get; set; }
+
+        [NotMapped]
+        public string Type
+        {
+            get => IsRectangle ? TypePolygonConst.Rectangle : TypePolygonConst.Polygon;
+        }
+
+        [NotMapped]
+        public string MapLayer
+        {
+            get => IsRectangle ? MapLayerPolygonConst.Rectangle : MapLayerPolygonConst.Polygon;
+        }
+
+        [NotMapped]
+        public string AreaDisplay
+        {
+            get
+            {
+                if (Area < 1.00)
+                {
+                    double metter = Area * 1000000000;
+                    return string.Format("{0:0.00}m²", metter);
+                }
+                else
+                {
+                    return string.Format("{0:0.00}km²", Area);
+                }
+            }
+        }
+
+        [NotMapped]
+        public string LengthDisplay
+        {
+            get
+            {
+                if (Length >= 1000)
+                {
+                    double kilometer = Length / 1000;
+                    return string.Format("{0:0.00}km", kilometer);
+                }
+                else
+                {
+                    return string.Format("{0:0.00}m", Length);
+                }
+            }
+        }
     }
 }

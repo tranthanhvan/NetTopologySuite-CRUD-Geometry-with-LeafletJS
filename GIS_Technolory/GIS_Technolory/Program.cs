@@ -18,6 +18,7 @@ builder.Services.AddTransient<ITypePolylineService, TypePolylineService>();
 builder.Services.AddTransient<IMarkerService, MarkerService>();
 builder.Services.AddTransient<IPolylineService, PolylineService>();
 builder.Services.AddTransient<ICircleService, CircleService>();
+builder.Services.AddTransient<IPolygonService, PolygonService>();
 
 builder.Services.AddControllers().AddNewtonsoftJson(opt =>
 {

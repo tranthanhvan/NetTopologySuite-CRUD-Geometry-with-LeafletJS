@@ -1,4 +1,7 @@
-﻿namespace GIS_Technolory.Models
+﻿using GIS_Technolory.Constants;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace GIS_Technolory.Models
 {
     public class PolygonModel
     {
@@ -16,16 +19,36 @@
 
         public bool IsRectangle { get; set; }
 
-        public int NumPoints { get; set; }
+        public int NumPoints
+        {
+            get => LatLongs.Count;
+        }
 
-        public double Length { get; set; }
+        public string LengthDisplay { get; set; }
 
-        public double Area { get; set; }
+        public string AreaDisplay { get; set; }
 
         public string FillColor { get; set; }
 
         public float FillOpacity { get; set; }
 
+        public List<LatLongModel> LatLongs { get; set; }
 
+        [NotMapped]
+        public string Type
+        {
+            get => IsRectangle ? TypePolygonConst.Rectangle : TypePolygonConst.Polygon;
+        }
+
+        [NotMapped]
+        public string MapLayer
+        {
+            get => IsRectangle ? MapLayerPolygonConst.Rectangle : MapLayerPolygonConst.Polygon;
+        }
+
+        public bool IsValid
+        {
+            get => LatLongs != null && LatLongs.Distinct().Count() >= 3;
+        }
     }
 }

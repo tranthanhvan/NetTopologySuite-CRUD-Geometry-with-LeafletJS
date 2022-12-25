@@ -4,6 +4,7 @@ using GIS_Technolory.Models;
 using GIS_Technolory.Response;
 using GIS_Technolory.Serivces;
 using Microsoft.AspNetCore.Mvc;
+using NetTopologySuite.Geometries;
 
 namespace GIS_Technolory.Controllers
 {
@@ -35,7 +36,7 @@ namespace GIS_Technolory.Controllers
                     LatLongs = uploadRecord.LatLongs.Select(x=> new PolylineLatLong()
                     {
                         ID = Guid.NewGuid().ToString(),
-                        Location = new NetTopologySuite.Geometries.Point(x.Longitude, x.Latitude) { SRID = 4326 },
+                        Location = new Point(x.Longitude, x.Latitude) { SRID = 4326 },
                         Order = x.Order,
                         PolylineID = uploadRecord.ID
                     }).ToList()
@@ -258,7 +259,7 @@ namespace GIS_Technolory.Controllers
                         polyline.LatLongs = uploadRecord.LatLongs.Select(x => new PolylineLatLong()
                         {
                             ID = Guid.NewGuid().ToString(),
-                            Location = new NetTopologySuite.Geometries.Point(x.Longitude, x.Latitude) { SRID = 4326 },
+                            Location = new Point(x.Longitude, x.Latitude) { SRID = 4326 },
                             Order = x.Order,
                             PolylineID = uploadRecord.ID
                         }).ToList();

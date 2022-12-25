@@ -1,0 +1,114 @@
+﻿@model PolygonModel;
+
+
+<form id="form-polygon-input" name="form-polygon-input">
+    <input type="text" id="form-polygon-input-id" maxlength="250" class="form-control" value="@Model.ID" hidden />
+    <div class="row padding-form">
+        <div class="col-md-4">
+            <label>Type :</label>
+        </div>
+        <div class="col-md-8">
+            <input type="text" value="@Model.Type" class="form-control" readonly />
+        </div>
+    </div>
+    <div class="row padding-form">
+        <div class="col-md-4">
+            <label>Name :</label>
+        </div>
+        <div class="col-md-8">
+            <input type="text" id="form-polygon-input-name" name="form-polygon-input-name" maxlength="250" class="form-control" value="@Model.Name" />
+        </div>
+    </div>
+
+    <div class="row padding-form">
+        <div class="col-md-4">
+            <label>Color border :</label>
+        </div>
+        <div class="col-md-2">
+            <input type="color" id="form-polygon-input-color" name="form-polygon-input-color" value="@Model.Color" />
+        </div>
+        <div class="col-md-4">
+            <label>Weight border :</label>
+        </div>
+        <div class="col-md-2">
+            <input type="number" id="form-polygon-input-weight-border" class="form-control" name="form-polygon-input-weight-border" value="@Model.WeightBorder" />
+        </div>
+    </div>
+
+    <div class="row padding-form">
+        <div class="col-md-4">
+            <label>Opacity :</label>
+        </div>
+        <div class="col-md-3">
+            <input type="number" id="form-polygon-input-opacity" step="0.1" class="form-control" name="form-polygon-input-opacity" value="@Model.Opacity" />
+        </div>
+        <div class="col-md-3">
+            <label>Points :</label>
+        </div>
+        <div class="col-md-2">
+            <input type="number" id="form-polygon-input-nubmer-point" class="form-control" readonly name="form-polygon-input-nubmer-point" value="@Model.NumPoints" />
+        </div>
+    </div>
+
+    <div class="row padding-form">
+        <div class="col-md-4">
+            <label>Fill color :</label>
+        </div>
+        <div class="col-md-2">
+            <input type="color" id="form-polygon-input-fill-color" name="form-polygon-input-fill-color" value="@Model.FillColor" />
+        </div>
+        <div class="col-md-3">
+            <label>Fill opacity :</label>
+        </div>
+        <div class="col-md-3">
+            <input type="number" step="0.1" id="form-polygon-input-fill-opacity" class="form-control" name="form-polygon-input-fill-opacity" value="@Model.FillOpacity" />
+        </div>
+    </div>
+
+    <div class="row padding-form">
+        <div class="col-md-4">
+            <label>Length  :</label>
+        </div>
+        <div class="col-md-8">
+            <input type="text" id="form-polygon-input-length" maxlength="50" class="form-control" value="@Model.LengthDisplay" readonly />
+        </div>
+    </div>
+
+    <div class="row padding-form">
+        <div class="col-md-4">
+            <label>Area :</label>
+        </div>
+        <div class="col-md-8">
+            <input type="text" id="form-polygon-input-central" maxlength="50" class="form-control" value="@Model.AreaDisplay" readonly />
+        </div>
+    </div>
+
+    <div class="row padding-form">
+        <div class="col-md-12">
+            <table class="table" id="form-Polygon-table-data-latlngs">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Long</th>
+                        <th scope="col">Lat</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int i = 1;
+                    }
+                    @foreach (var item in @Model.LatLongs)
+                    {
+                        <tr>
+                            <th scope="row">@i</th>
+                            <td>@item.lng</td>
+                            <td>@item.lat</td>
+                        </tr>
+                        i++;
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</form>

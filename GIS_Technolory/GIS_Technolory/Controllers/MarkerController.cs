@@ -4,6 +4,7 @@ using GIS_Technolory.Models;
 using GIS_Technolory.Response;
 using GIS_Technolory.Serivces;
 using Microsoft.AspNetCore.Mvc;
+using NetTopologySuite.Geometries;
 
 namespace GIS_Technolory.Controllers
 {
@@ -28,7 +29,7 @@ namespace GIS_Technolory.Controllers
                 {
                     ID = Guid.NewGuid().ToString(),
                     Name = uploadRecord.Name,
-                    Location = new NetTopologySuite.Geometries.Point(uploadRecord.Long, uploadRecord.Lat) { SRID = 4326 },
+                    Location = new Point(uploadRecord.Long, uploadRecord.Lat) { SRID = 4326 },
                     TypeID = uploadRecord.TypeID
                 });
                 response.Data = await _markerService.Get(create.ID);
@@ -97,7 +98,7 @@ namespace GIS_Technolory.Controllers
                 }
                 else
                 {
-                    marker.Location = new NetTopologySuite.Geometries.Point(uploadRecord.Long, uploadRecord.Lat) { SRID = 4326 };
+                    marker.Location = new Point(uploadRecord.Long, uploadRecord.Lat) { SRID = 4326 };
                     await _markerService.Update(marker);
                     response.Data = marker;
                     response.Success = response.Data != null;

@@ -1,29 +1,26 @@
 ﻿using GIS_Technolory.Entities;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore;
-using System.Security.AccessControl;
 
 namespace GIS_Technolory.Serivces
 {
-    public interface IPolylineService
+    public interface IPolygonService
     {
-        Task<Polyline> Create(Polyline uploadRecord);
+        Task<Polygon> Create(Polygon uploadRecord);
 
-        Task<Polyline> Update(Polyline uploadRecord);
+        Task<Polygon> Update(Polygon uploadRecord);
 
         Task<bool> Delete(string id);
 
-        Task<IEnumerable<Polyline>> GetList(string name = null);
+        Task<IEnumerable<Polygon>> GetList(string name = null);
 
-        Task<Polyline> Get(string id);
+        Task<Polygon> Get(string id);
     }
 
-    public class PolylineService : BaseService, IPolylineService
+    public class PolygonService : BaseService, IPolygonService
     {
-        public async Task<Polyline> Create(Polyline uploadRecord)
+        public async Task<Polygon> Create(Polygon uploadRecord)
         {
-            string typeName = string.Empty;
-            typeName = _Context.TypePolylines.FirstOrDefault(x => x.ID.Equals(uploadRecord.TypeID)).Name;
             uploadRecord.PopupContent = $@"<div style='width : 280px'>
                                               <div class='row row_padding'>
                                                   <div class='col-3 popup-title-lf'>
@@ -38,7 +35,15 @@ namespace GIS_Technolory.Serivces
                                                       <span class='sp-pup-tittle-lf'>Type</span>
                                                   </div>
                                                   <div class='col-9 css_bg_view'>
-                                                      <span>{typeName}</span>
+                                                      <span>{uploadRecord.Type}</span>
+                                                  </div>
+                                               </div>
+                                               <div class='row row_padding'>
+                                                  <div class='col-3 popup-title-lf'>
+                                                      <span class='sp-pup-tittle-lf'>Number Points</span>
+                                                  </div>
+                                                  <div class='col-9 css_bg_view'>
+                                                      <span>{uploadRecord.NumPoints}</span>
                                                   </div>
                                                </div>
                                                <div class='row row_padding'>
@@ -46,20 +51,26 @@ namespace GIS_Technolory.Serivces
                                                       <span class='sp-pup-tittle-lf'>Length</span>
                                                   </div>
                                                   <div class='col-9 css_bg_view'>
-                                                      <span>{uploadRecord.CablineLength}</span>
+                                                      <span>{uploadRecord.LengthDisplay}</span>
+                                                  </div>
+                                               </div>
+                                              <div class='row row_padding'>
+                                                  <div class='col-3 popup-title-lf'>
+                                                      <span class='sp-pup-tittle-lf'>Area</span>
+                                                  </div>
+                                                  <div class='col-9 css_bg_view'>
+                                                      <span>{uploadRecord.AreaDisplay}</span>
                                                   </div>
                                                </div>
                                               <div class='swal2-actions'>
-                                                  <button onclick='EditPolyline(`{uploadRecord.ID}`)' class='swal2-confirm swal2-styled act-popup-leaflet'>Edit info</button>&nbsp;
-                                                  <button onclick='DeletePolyline(`{uploadRecord.ID}`)' class='swal2-deny swal2-styled'>Delete</button>
+                                                  <button onclick='EditPolygon(`{uploadRecord.ID}`)' class='swal2-confirm swal2-styled act-popup-leaflet'>Edit info</button>&nbsp;
+                                                  <button onclick='DeletePolygon(`{uploadRecord.ID}`)' class='swal2-deny swal2-styled'>Delete</button>
                                               </div>
                                             </div>
                                           ";
-
-
-            EntityEntry<Polyline> record = await _Context.AddAsync(uploadRecord);
+            EntityEntry<Polygon> record = await _Context.AddAsync(uploadRecord);
             int result = await _Context.SaveChangesAsync();
-            if (result > 0)
+            if (result == 1)
                 return record.Entity;
             else
                 return null;
@@ -67,37 +78,35 @@ namespace GIS_Technolory.Serivces
 
         public async Task<bool> Delete(string id)
         {
-            Polyline target = await _Context.Polylines.Include(x=>x.LatLongs).FirstOrDefaultAsync(x => x.ID.Equals(id));
+            Polygon target = await _Context.Polygons.FirstOrDefaultAsync(x => x.ID.Equals(id));
             if (target is null)
                 return false;
             else
             {
-                _Context.Polylines.Remove(target);
+                _Context.Polygons.Remove(target);
                 int result = await _Context.SaveChangesAsync();
                 return result != 0;
             }
         }
 
-        public async Task<Polyline> Get(string id)
+        public async Task<Polygon> Get(string id)
         {
-            return await _Context.Polylines.Include(x=>x.Type).Include(x=>x.LatLongs.OrderBy(x => x.Order)).FirstOrDefaultAsync(x => x.ID.Equals(id));
+            return await _Context.Polygons.FirstOrDefaultAsync(x => x.ID.Equals(id));
         }
 
-        public async Task<IEnumerable<Polyline>> GetList(string name = null)
+        public async Task<IEnumerable<Polygon>> GetList(string name = null)
         {
             if (string.IsNullOrEmpty(name))
-                return await _Context.Polylines.Include(x => x.Type).Include(x => x.LatLongs.OrderBy(x => x.Order)).ToListAsync();
+                return await _Context.Polygons.ToListAsync();
             else
             {
                 string search = name.Trim().ToLower();
-                return await _Context.Polylines.Include(x => x.Type).Include(x=>x.LatLongs.OrderBy(x=>x.Order)).Where(x => x.Name.ToLower().Contains(search)).ToListAsync();
+                return await _Context.Polygons.Where(x => x.Name.Contains(search)).ToListAsync();
             }
         }
 
-        public async Task<Polyline> Update(Polyline uploadRecord)
+        public async Task<Polygon> Update(Polygon uploadRecord)
         {
-            string typeName = string.Empty;
-            typeName = _Context.TypePolylines.FirstOrDefault(x => x.ID.Equals(uploadRecord.TypeID)).Name;
             uploadRecord.PopupContent = $@"<div style='width : 280px'>
                                               <div class='row row_padding'>
                                                   <div class='col-3 popup-title-lf'>
@@ -112,7 +121,15 @@ namespace GIS_Technolory.Serivces
                                                       <span class='sp-pup-tittle-lf'>Type</span>
                                                   </div>
                                                   <div class='col-9 css_bg_view'>
-                                                      <span>{typeName}</span>
+                                                      <span>{uploadRecord.Type}</span>
+                                                  </div>
+                                               </div>
+                                               <div class='row row_padding'>
+                                                  <div class='col-3 popup-title-lf'>
+                                                      <span class='sp-pup-tittle-lf'>Number Points</span>
+                                                  </div>
+                                                  <div class='col-9 css_bg_view'>
+                                                      <span>{uploadRecord.NumPoints}</span>
                                                   </div>
                                                </div>
                                                <div class='row row_padding'>
@@ -120,17 +137,24 @@ namespace GIS_Technolory.Serivces
                                                       <span class='sp-pup-tittle-lf'>Length</span>
                                                   </div>
                                                   <div class='col-9 css_bg_view'>
-                                                      <span>{uploadRecord.CablineLength}</span>
+                                                      <span>{uploadRecord.LengthDisplay}</span>
+                                                  </div>
+                                               </div>
+                                              <div class='row row_padding'>
+                                                  <div class='col-3 popup-title-lf'>
+                                                      <span class='sp-pup-tittle-lf'>Area</span>
+                                                  </div>
+                                                  <div class='col-9 css_bg_view'>
+                                                      <span>{uploadRecord.AreaDisplay}</span>
                                                   </div>
                                                </div>
                                               <div class='swal2-actions'>
-                                                  <button onclick='EditPolyline(`{uploadRecord.ID}`)' class='swal2-confirm swal2-styled act-popup-leaflet'>Edit info</button>&nbsp;
-                                                  <button onclick='DeletePolyline(`{uploadRecord.ID}`)' class='swal2-deny swal2-styled'>Delete</button>
+                                                  <button onclick='EditPolygon(`{uploadRecord.ID}`)' class='swal2-confirm swal2-styled act-popup-leaflet'>Edit info</button>&nbsp;
+                                                  <button onclick='DeletePolygon(`{uploadRecord.ID}`)' class='swal2-deny swal2-styled'>Delete</button>
                                               </div>
                                             </div>
                                           ";
-
-            EntityEntry<Polyline> record = _Context.Update(uploadRecord);
+            EntityEntry<Polygon> record = _Context.Update(uploadRecord);
             int result = await _Context.SaveChangesAsync();
             if (result == 1)
                 return record.Entity;

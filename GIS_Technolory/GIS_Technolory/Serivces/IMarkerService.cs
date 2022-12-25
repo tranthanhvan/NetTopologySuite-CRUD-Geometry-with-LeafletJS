@@ -1,8 +1,6 @@
 ﻿using GIS_Technolory.Entities;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore;
-using Azure.Core;
-using System.Security.AccessControl;
 
 namespace GIS_Technolory.Serivces
 {
@@ -81,7 +79,7 @@ namespace GIS_Technolory.Serivces
             else
             {
                 string search = name.Trim().ToLower();
-                return await _Context.Markers.Include(x=>x.Type).Where(x => x.Name.Contains(search)).ToListAsync();
+                return await _Context.Markers.Include(x=>x.Type).Where(x => x.Name.ToLower().Contains(search)).ToListAsync();
             }
         }
 

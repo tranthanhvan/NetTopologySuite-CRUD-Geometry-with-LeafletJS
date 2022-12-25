@@ -45,6 +45,8 @@ namespace GIS_Technolory.Controllers
                 }));
                 typeSelect.Add(new { Name = TypeCircleConst.Circle, MapName = MapLayerCircleConst.Circle });
                 typeSelect.Add(new { Name = TypeCircleConst.CircleMarker, MapName = MapLayerCircleConst.CircleMarker });
+                typeSelect.Add(new { Name = TypePolygonConst.Polygon, MapName = MapLayerPolygonConst.Polygon });
+                typeSelect.Add(new { Name = TypePolygonConst.Rectangle, MapName = MapLayerPolygonConst.Rectangle });
                 #endregion Type Maps
 
                 IEnumerable<Marker> markers = await _markerService.GetList();

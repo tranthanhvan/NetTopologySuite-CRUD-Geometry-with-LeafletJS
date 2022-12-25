@@ -5,6 +5,7 @@ using GIS_Technolory.Models;
 using GIS_Technolory.Response;
 using GIS_Technolory.Serivces;
 using Microsoft.AspNetCore.Mvc;
+using NetTopologySuite.Geometries;
 
 namespace GIS_Technolory.Controllers
 {
@@ -33,7 +34,7 @@ namespace GIS_Technolory.Controllers
                     Radius = uploadRecord.Radius,
                     FillColor = uploadRecord.FillColor,
                     FillOpacity = uploadRecord.FillOpacity,
-                    Location = new NetTopologySuite.Geometries.Point(uploadRecord.Longitude, uploadRecord.Latitude) { SRID = 4326 }
+                    Location = new Point(uploadRecord.Longitude, uploadRecord.Latitude) { SRID = 4326 }
                 });
                 response.Success = response.Data != null;
                 response.Message = "Create Circle is successful";
@@ -84,11 +85,10 @@ namespace GIS_Technolory.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateLocation([FromBody] CircleModel uploadRecord)
         {
-            var response = new Response<object>();
+            var response = new Response<Circle>();
             try
             {
                 Circle circle = await _CircleService.Get(uploadRecord.ID);
-
                 if (circle is null)
                 {
                     response.Success = false;
@@ -96,13 +96,16 @@ namespace GIS_Technolory.Controllers
                 }
                 else
                 {
-                    circle.Location = new NetTopologySuite.Geometries.Point(uploadRecord.Longitude, uploadRecord.Latitude) { SRID = 4326 };
+                    circle.Location = new Point(uploadRecord.Longitude, uploadRecord.Latitude) { SRID = 4326 };
                     if (!circle.IsCircleMarker)
                         circle.Radius = uploadRecord.Radius;
 
                     response.Data = await _CircleService.Update(circle);
                     response.Success = response.Data != null;
-                    response.Message = "Update Location Circle is successful";
+                    if(response.Data.IsCircleMarker)
+                        response.Message = "Update Location Circle Marker is successful";
+                    else
+                        response.Message = "Update Location Circle is successful";
                 }
             }
             catch (Exception ex)
@@ -119,19 +122,21 @@ namespace GIS_Technolory.Controllers
             var response = new Response<Circle>();
             try
             {
-                var Circle = await _CircleService.Get(id);
-                if (Circle is null)
+                var circle = await _CircleService.Get(id);
+                if (circle is null)
                 {
                     response.Success = false;
                     response.Message = "Circle is not found in databases";
                 }
                 else
                 {
-                    response.Data = Circle;
+                    response.Data = circle;
                     response.Success = await _CircleService.Delete(id);
-                    response.Message = "Delete Circle is successful";
+                    if(circle.IsCircleMarker) 
+                        response.Message = "Delete Circle marker is successful";
+                    else
+                        response.Message = "Delete Circle is successful";
                 }
-
             }
             catch (Exception ex)
             {

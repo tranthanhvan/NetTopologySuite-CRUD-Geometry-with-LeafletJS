@@ -103,7 +103,7 @@ namespace GIS_Technolory.Serivces
             else
             {
                 string search = name.Trim().ToLower();
-                return await _Context.Circles.Where(x => x.Name.Contains(search)).ToListAsync();
+                return await _Context.Circles.Where(x => x.Name.ToLower().Contains(search)).ToListAsync();
             }
         }
 

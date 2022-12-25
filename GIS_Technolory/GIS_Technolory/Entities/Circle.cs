@@ -74,9 +74,9 @@ namespace GIS_Technolory.Entities
                 else
                 {
                     double area = Math.PI * Radius * Radius;
-                    if (area >= 1000)
+                    if (area >= 1000000)
                     {
-                        double kilometer = area / 1000;
+                        double kilometer = area / 1000000;
                         return string.Format("{0:0.00}km²", kilometer);
                     }
                     else
