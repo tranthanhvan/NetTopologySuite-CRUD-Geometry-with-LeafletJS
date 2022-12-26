@@ -1,4 +1,5 @@
 ﻿using GIS_Technolory.Constants;
+using GIS_Technolory.Helpers;
 using GIS_Technolory.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -45,7 +46,7 @@ namespace GIS_Technolory.Entities
         /// </summary>
         public double Area
         {
-            get => Location.Area;
+            get => SphericalUtil.ComputeSignedArea(LatLngs);
         }
 
         [NotMapped]
@@ -92,14 +93,14 @@ namespace GIS_Technolory.Entities
         {
             get
             {
-                if (Area < 1.00)
+                if (Area >= 1000000)
                 {
-                    double metter = Area * 1000000000;
-                    return string.Format("{0:0.00}m²", metter);
+                    double kilometer = Area / 1000000;
+                    return string.Format("{0:0.00}km²", kilometer);
                 }
                 else
                 {
-                    return string.Format("{0:0.00}km²", Area);
+                    return string.Format("{0:0.00}m²", Area);
                 }
             }
         }

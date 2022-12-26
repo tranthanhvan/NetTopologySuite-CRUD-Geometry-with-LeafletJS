@@ -48,6 +48,31 @@ namespace GIS_Technolory.Entities
         }
 
         [NotMapped]
+        public string Perimeter
+        {
+            get
+            {
+                if (double.IsNaN(Radius) || Radius == 0)
+                    return string.Empty;
+                else
+                {
+                    double perimeter= Math.PI * 2 * Radius;
+                    if(perimeter >= 1000)
+                    {
+                        double Kilometer = Radius / 1000;
+                        return string.Format("{0:0.00}km", Kilometer);
+                    }
+                    else
+                    {
+                        return string.Format("{0:0.00}m", perimeter);
+                    }
+                    
+                }
+                
+            }
+        }
+
+        [NotMapped]
         public string DisplayRadius
         {
             get
