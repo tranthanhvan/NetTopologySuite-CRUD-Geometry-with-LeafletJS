@@ -34,19 +34,27 @@ namespace GIS_Technolory.Serivces
                                 </div>
                                 <div class='row row_padding'>
                                     <div class='col-3 popup-title-lf'>
+                                        <span class='sp-pup-tittle-lf'>Perimeter</span>
+                                    </div>
+                                    <div class='col-9 css_bg_view'>
+                                        <span>{uploadRecord.Perimeter}</span>
+                                    </div>
+                                </div>
+                                <div class='row row_padding'>
+                                    <div class='col-3 popup-title-lf'>
                                         <span class='sp-pup-tittle-lf'>Area</span>
                                     </div>
                                     <div class='col-9 css_bg_view'>
                                         <span>{uploadRecord.Area}</span>
                                     </div>
-                                 </div>";
+                                </div>";
             }
             else
             {
                 uploadRecord.Radius = 0;
             }
 
-            uploadRecord.PopupContent = $@"<div style='width : 280px'>
+            uploadRecord.PopupContent = $@"<div style='width : 300px'>
                                              <div class='row row_padding'>
                                                 <div class='col-3 popup-title-lf'>
                                                     <span class='sp-pup-tittle-lf'>Name</span>
@@ -122,15 +130,23 @@ namespace GIS_Technolory.Serivces
                                 </div>
                                 <div class='row row_padding'>
                                     <div class='col-3 popup-title-lf'>
+                                        <span class='sp-pup-tittle-lf'>Perimeter</span>
+                                    </div>
+                                    <div class='col-9 css_bg_view'>
+                                        <span>{uploadRecord.Perimeter}</span>
+                                    </div>
+                                </div>
+                                <div class='row row_padding'>
+                                    <div class='col-3 popup-title-lf'>
                                         <span class='sp-pup-tittle-lf'>Area</span>
                                     </div>
                                     <div class='col-9 css_bg_view'>
                                         <span>{uploadRecord.Area}</span>
                                     </div>
-                                 </div>";
+                                </div>";
             }
 
-            uploadRecord.PopupContent = $@"<div style='width : 280px'>
+            uploadRecord.PopupContent = $@"<div style='width : 300px'>
                                              <div class='row row_padding'>
                                                 <div class='col-3 popup-title-lf'>
                                                     <span class='sp-pup-tittle-lf'>Name</span>

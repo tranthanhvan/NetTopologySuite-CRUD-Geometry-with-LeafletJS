@@ -1,6 +1,8 @@
 ﻿using GIS_Technolory.Constants;
 using GIS_Technolory.Helpers;
 using GIS_Technolory.Models;
+using NetTopologySuite;
+using NetTopologySuite.Geometries;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -37,7 +39,7 @@ namespace GIS_Technolory.Entities
         [NotMapped]
         public double Length
         {
-            get => Location.Length;
+            get => SphericalUtil.computeLength(AllLatLngs);
         }
 
         [NotMapped]
@@ -47,6 +49,22 @@ namespace GIS_Technolory.Entities
         public double Area
         {
             get => SphericalUtil.ComputeSignedArea(LatLngs);
+        }
+
+        [NotMapped]
+        public LatLongModel Centroid
+        {
+            get => new LatLongModel() { lat = Location.Centroid.Y, lng = Location.Centroid.X };
+        }
+
+        [NotMapped]
+        public List<LatLongModel> AllLatLngs
+        {
+            get => Location.Coordinates.Select(x => new LatLongModel()
+            {
+                lat = x.CoordinateValue.Y,
+                lng = x.CoordinateValue.X
+            }).ToList();
         }
 
         [NotMapped]

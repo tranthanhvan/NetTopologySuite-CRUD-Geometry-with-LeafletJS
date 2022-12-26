@@ -98,4 +98,16 @@
             </div>
         </div>
     }
+
+    @if (!string.IsNullOrEmpty(Model.Perimeter))
+    {
+        <div class="row padding-form">
+            <div class="col-md-4">
+                <label>Perimeter :</label>
+            </div>
+            <div class="col-md-8">
+                <input type="text" id="form-circle-display-perimeter" name="form-circle-display-perimeter" maxlength="50" class="form-control" value="@Model.Perimeter" readonly />
+            </div>
+        </div>
+    }
 </form>

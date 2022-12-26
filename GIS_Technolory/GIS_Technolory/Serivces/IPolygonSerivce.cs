@@ -40,7 +40,7 @@ namespace GIS_Technolory.Serivces
                                                </div>
                                                <div class='row row_padding'>
                                                   <div class='col-3 popup-title-lf'>
-                                                      <span class='sp-pup-tittle-lf'>Number Points</span>
+                                                      <span class='sp-pup-tittle-lf'>Points</span>
                                                   </div>
                                                   <div class='col-9 css_bg_view'>
                                                       <span>{uploadRecord.NumPoints}</span>
@@ -126,7 +126,7 @@ namespace GIS_Technolory.Serivces
                                                </div>
                                                <div class='row row_padding'>
                                                   <div class='col-3 popup-title-lf'>
-                                                      <span class='sp-pup-tittle-lf'>Number Points</span>
+                                                      <span class='sp-pup-tittle-lf'>Points</span>
                                                   </div>
                                                   <div class='col-9 css_bg_view'>
                                                       <span>{uploadRecord.NumPoints}</span>

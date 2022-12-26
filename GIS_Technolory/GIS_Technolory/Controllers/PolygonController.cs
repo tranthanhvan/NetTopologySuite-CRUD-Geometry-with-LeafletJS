@@ -22,6 +22,8 @@ namespace GIS_Technolory.Controllers
             var response = new Response<Polygon>();
             try
             {
+                uploadRecord.LatLongs.Add(uploadRecord.LatLongs.FirstOrDefault());
+                uploadRecord.LatLongs.Reverse();
                 var linearRing = new NetTopologySuite.Geometries.LinearRing(uploadRecord.LatLongs.Select(m => new NetTopologySuite.Geometries.Coordinate
                 {
                     X = m.lng,
@@ -87,26 +89,33 @@ namespace GIS_Technolory.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateLocation([FromBody] PolygonModel uploadRecord)
         {
-            var response = new Response<Polygon>();
+            var response = new Response<object>();
             try
             {
-                Polygon Polygon = await _PolygonService.Get(uploadRecord.ID);
-                if (Polygon is null)
+                Polygon polygon = await _PolygonService.Get(uploadRecord.ID);
+                if (polygon is null)
                 {
                     response.Success = false;
                     response.Message = "Polygon is not found in databases";
                 }
                 else
                 {
+                    string oldLayer = polygon.MapLayer;
+                    uploadRecord.LatLongs.Add(uploadRecord.LatLongs.FirstOrDefault());
                     var linearRing = new NetTopologySuite.Geometries.LinearRing(uploadRecord.LatLongs.Select(m => new NetTopologySuite.Geometries.Coordinate
                     {
                         X = m.lng,
                         Y = m.lat
                     }).ToArray());
-                    Polygon.Location = new NetTopologySuite.Geometries.Polygon(linearRing) { SRID = 4326 };
-                    response.Data = await _PolygonService.Update(Polygon);
+                    polygon.Location = new NetTopologySuite.Geometries.Polygon(linearRing) { SRID = 4326 };
+                    polygon = await _PolygonService.Update(polygon);
+                    response.Data = new
+                    {
+                        Polygon = polygon,
+                        OldLayer = oldLayer
+                    };
                     response.Success = response.Data != null;
-                    if (response.Data.IsRectangle)
+                    if (polygon.IsRectangle)
                         response.Message = "Update Location Polygon Rectangle is successful";
                     else
                         response.Message = "Update Location Polygon is successful";
@@ -157,18 +166,18 @@ namespace GIS_Technolory.Controllers
             var response = new Response<string>();
             try
             {
-                input.LatLongs.Add(input.LatLongs.FirstOrDefault());
-                var coordinates = input.LatLongs.Select(m => new NetTopologySuite.Geometries.Coordinate
-                {
-                    X = m.lng,
-                    Y = m.lat
-                }).ToArray();
-
                 var Polygon = await _PolygonService.Get(input.ID);
                 PolygonModel modelResult;
-
                 if (Polygon is null)
                 {
+                    input.LatLongs.Add(input.LatLongs.FirstOrDefault());
+                    input.LatLongs.Reverse();
+                    var coordinates = input.LatLongs.Select(m => new NetTopologySuite.Geometries.Coordinate
+                    {
+                        X = m.lng,
+                        Y = m.lat
+                    }).ToArray();
+
                     var linearRing = new NetTopologySuite.Geometries.LinearRing(coordinates);
                     var tempPlg = new Polygon()
                     {

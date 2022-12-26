@@ -43,7 +43,6 @@ namespace GIS_Technolory.Models
             }
         }
 
-        [NotMapped]
         public string Area
         {
             get
@@ -61,6 +60,28 @@ namespace GIS_Technolory.Models
                     else
                     {
                         return string.Format("{0:0.00}m²", area);
+                    }
+                }
+            }
+        }
+
+        public string Perimeter
+        {
+            get
+            {
+                if (double.IsNaN(Radius) || Radius == 0)
+                    return string.Empty;
+                else
+                {
+                    double perimeter = Math.PI * 2 * Radius;
+                    if (perimeter >= 1000)
+                    {
+                        double Kilometer = perimeter / 1000;
+                        return string.Format("{0:0.00}km", Kilometer);
+                    }
+                    else
+                    {
+                        return string.Format("{0:0.00}m", perimeter);
                     }
                 }
             }

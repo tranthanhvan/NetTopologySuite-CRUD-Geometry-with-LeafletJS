@@ -14,14 +14,21 @@ namespace GIS_Technolory.Controllers
         private readonly ITypeMarkerService _typeMarkerService;
         private readonly ITypePolylineService _typePolylineService;
         private readonly ICircleService _CircleService;
+        private readonly IPolygonService _polygonService;
 
-        public GeoController(IMarkerService markerService, IPolylineService polylineService, ITypeMarkerService typeMarkerService, ITypePolylineService typePolylineService, ICircleService CircleService)
+        public GeoController(IMarkerService markerService, 
+            IPolylineService polylineService, 
+            ITypeMarkerService typeMarkerService, 
+            ITypePolylineService typePolylineService, 
+            ICircleService CircleService, 
+            IPolygonService polygonService)
         {
             _markerService = markerService;
             _polylineService = polylineService;
             _typeMarkerService = typeMarkerService;
             _typePolylineService = typePolylineService;
             _CircleService = CircleService;
+            _polygonService = polygonService;
         }
 
         [HttpGet]
@@ -68,6 +75,22 @@ namespace GIS_Technolory.Controllers
                     FillOpacity = x.FillOpacity
                 });
 
+                IEnumerable<Polygon> allPolygons = await _polygonService.GetList();
+                IEnumerable<PolygonModel> allPolygonModel = allPolygons.Select(x => new PolygonModel()
+                {
+                    ID = x.ID,
+                    Name = x.Name,
+                    Color = x.Color,
+                    PopupContent = x.PopupContent,
+                    WeightBorder = x.WeightBorder,
+                    Opacity = x.Opacity,
+                    FillColor = x.FillColor,
+                    FillOpacity = x.FillOpacity,
+                    LatLongs = x.LatLngs,
+                    IsRectangle = x.IsRectangle,
+                    LengthDisplay = x.LengthDisplay,
+                    AreaDisplay = x.AreaDisplay
+                });
 
                 response.Success = true;
                 response.Data = new
@@ -101,8 +124,9 @@ namespace GIS_Technolory.Controllers
                             Order = c.Order
                         }).ToList()
                     }),
-                    Circles = allCircles.Where(x=>!x.IsCircleMarker),
-                    CircleMarkers = allCircles.Where(x => x.IsCircleMarker)
+                    Circles = allCirlceModel.Where(x=>!x.IsCircleMarker),
+                    CircleMarkers = allCirlceModel.Where(x => x.IsCircleMarker),
+                    Polygons = allPolygonModel
                 };
             }
             catch (Exception ex)
