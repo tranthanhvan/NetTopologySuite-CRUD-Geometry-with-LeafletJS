@@ -31,15 +31,15 @@ namespace GIS_Technolory.Controllers
                     ID = uploadRecord.ID,
                     Name = uploadRecord.Name,
                     CablineLength = uploadRecord.CablineLength,
-                    CentralLatlng = uploadRecord.CentralLatlng,
                     TypeID = uploadRecord.TypeID,
-                    LatLongs = uploadRecord.LatLongs.Select(x=> new PolylineLatLong()
+                    Location = new LineString(uploadRecord.LatLongs.Select(m => new NetTopologySuite.Geometries.Coordinate
                     {
-                        ID = Guid.NewGuid().ToString(),
-                        Location = new Point(x.Longitude, x.Latitude) { SRID = 4326 },
-                        Order = x.Order,
-                        PolylineID = uploadRecord.ID
-                    }).ToList()
+                        X = m.lng,
+                        Y = m.lat
+                    }).ToArray())
+                    {
+                        SRID = 4326
+                    }
                 });
                 var model = await _polylineService.Get(uploadRecord.ID);
                 uploadRecord.MapName = model.Type.MapName;
@@ -94,13 +94,7 @@ namespace GIS_Technolory.Controllers
                             MapName = polyline.Type.MapName,
                             ColorLine = polyline.Type.ColorLine,
                             WeightLine = polyline.Type.WeightLine,
-                            LatLongs = polyline.LatLongs.Select(c => new PolylineLatLongModel()
-                            {
-                                ID = c.ID,
-                                Latitude = c.Latitude,
-                                Longitude = c.Longitude,
-                                Order = c.Order
-                            }).ToList()
+                            LatLongs = polyline.LatLongs
                         },
                         OldMapLayer = oldMapName
                     };
@@ -134,14 +128,7 @@ namespace GIS_Technolory.Controllers
                         Polyline = new PolylineModel()
                         {
                             CablineLength = input.CablineLength,
-                            CentralLatlng = input.CentralLatlng,
-                            LatLongs = input.LatLongs.Select(x => new PolylineLatLongModel()
-                            {
-                                ID = string.Empty,
-                                Latitude = x.Latitude,
-                                Longitude = x.Longitude,
-                                Order = x.Order
-                            }).ToList()
+                            LatLongs = input.LatLongs
                         },
                         Types = typePolinies.Select(x => new TypeModel()
                         {
@@ -161,14 +148,7 @@ namespace GIS_Technolory.Controllers
                             Name = polyline.Name,
                             TypeID = polyline.TypeID,
                             CablineLength = polyline.CablineLength,
-                            CentralLatlng = polyline.CentralLatlng,
-                            LatLongs = polyline.LatLongs.Select(x=> new PolylineLatLongModel()
-                            {
-                                ID = x.ID,
-                                Latitude = x.Latitude,
-                                Longitude = x.Longitude,
-                                Order = x.Order
-                            }).ToList()
+                            LatLongs = polyline.LatLongs
                         },
                         Types = typePolinies.Select(x => new TypeModel()
                         {
@@ -214,13 +194,7 @@ namespace GIS_Technolory.Controllers
                         MapName = polyline.Type.MapName,
                         ColorLine = polyline.Type.ColorLine,
                         WeightLine = polyline.Type.WeightLine,
-                        LatLongs = polyline.LatLongs.Select(c => new PolylineLatLongModel()
-                        {
-                            ID = c.ID,
-                            Latitude = c.Latitude,
-                            Longitude = c.Longitude,
-                            Order = c.Order
-                        }).ToList()
+                        LatLongs = polyline.LatLongs
                     };
                     response.Success = await _polylineService.Delete(id);
                     response.Message = "Delete Polyline is successful";
@@ -256,15 +230,15 @@ namespace GIS_Technolory.Controllers
                     }
                     else
                     {
-                        polyline.LatLongs = uploadRecord.LatLongs.Select(x => new PolylineLatLong()
+                        polyline.Location = new LineString(uploadRecord.LatLongs.Select(m => new NetTopologySuite.Geometries.Coordinate
                         {
-                            ID = Guid.NewGuid().ToString(),
-                            Location = new Point(x.Longitude, x.Latitude) { SRID = 4326 },
-                            Order = x.Order,
-                            PolylineID = uploadRecord.ID
-                        }).ToList();
+                            X = m.lng,
+                            Y = m.lat
+                        }).ToArray())
+                        {
+                            SRID = 4326
+                        };
                         polyline.CablineLength = uploadRecord.CablineLength;
-                        polyline.CentralLatlng = uploadRecord.CentralLatlng;
                         await _polylineService.Update(polyline);
                         response.Data = new PolylineModel()
                         {
@@ -277,14 +251,8 @@ namespace GIS_Technolory.Controllers
                             MapName = polyline.Type.MapName,
                             ColorLine = polyline.Type.ColorLine,
                             WeightLine = polyline.Type.WeightLine,
-                            LatLongs = polyline.LatLongs.Select(c => new PolylineLatLongModel()
-                            {
-                                ID = c.ID,
-                                Latitude = c.Latitude,
-                                Longitude = c.Longitude,
-                                Order = c.Order
-                            }).ToList()
-                        }; ;
+                            LatLongs = polyline.LatLongs
+                        };
                         response.Success = true;
                         response.Message = "Update Location polyline is successful";
                         response.Success = true;

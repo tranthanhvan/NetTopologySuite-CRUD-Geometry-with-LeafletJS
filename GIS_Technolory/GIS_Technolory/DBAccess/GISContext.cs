@@ -19,7 +19,6 @@ namespace GIS_Technolory.DBAccess
         public DbSet<TypeMarker> TypeMarkers { get; set; }
         public DbSet<Polyline> Polylines { get; set; }
         public DbSet<TypePolyline> TypePolylines { get; set; }
-        public DbSet<PolylineLatLong> PolylineLatLongs { get; set; }
         public DbSet<Circle> Circles { get; set; }
         public DbSet<Polygon> Polygons { get; set; }
 

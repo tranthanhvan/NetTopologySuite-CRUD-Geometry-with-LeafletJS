@@ -4,6 +4,7 @@ using GIS_Technolory.Models;
 using GIS_Technolory.Response;
 using GIS_Technolory.Serivces;
 using Microsoft.AspNetCore.Mvc;
+using NuGet.Packaging;
 
 namespace GIS_Technolory.Controllers
 {
@@ -116,18 +117,90 @@ namespace GIS_Technolory.Controllers
                         MapName = x.Type.MapName,
                         ColorLine = x.Type.ColorLine,
                         WeightLine = x.Type.WeightLine,
-                        LatLongs = x.LatLongs.Select(c => new PolylineLatLongModel()
-                        {
-                            ID = c.ID,
-                            Latitude = c.Latitude,
-                            Longitude = c.Longitude,
-                            Order = c.Order
-                        }).ToList()
+                        LatLongs = x.LatLongs
                     }),
                     Circles = allCirlceModel.Where(x=>!x.IsCircleMarker),
                     CircleMarkers = allCirlceModel.Where(x => x.IsCircleMarker),
                     Polygons = allPolygonModel
                 };
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message + ex.InnerException;
+            }
+            return Ok(response);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> SearchGeoData(string keyWord)
+        {
+            if (string.IsNullOrEmpty(keyWord))
+                return BadRequest();
+            var response = new Response<object>();
+            try
+            {
+                var result = new List<GeoSearchModel>();
+                IEnumerable<Marker> markers = await _markerService.GetList(keyWord);
+                IEnumerable<Polyline> polylines = await _polylineService.GetList(keyWord);
+                IEnumerable<Circle> allCircles = await _CircleService.GetList(keyWord);
+                IEnumerable<Polygon> allPolygons = await _polygonService.GetList(keyWord);
+
+                result.AddRange(markers.Select(x => new GeoSearchModel()
+                {
+                    ID = x.ID,
+                    Name = x.Name,
+                    Icon = x.Type.Icon,
+                    Latitude = x.Latitude,
+                    Longitude = x.Longitude,
+                    MapLayer = x.Type.MapName
+                }));
+
+                result.AddRange(allCircles.Select(x => new GeoSearchModel()
+                {
+                    ID = x.ID,
+                    Name = x.Name,
+                    Icon = x.IsCircleMarker ? MapIconCircleConst.CircleMarker : MapIconCircleConst.Circle,
+                    Latitude = x.Latitude,
+                    Longitude = x.Longitude,
+                    MapLayer = x.IsCircleMarker ? MapLayerCircleConst.CircleMarker : MapLayerCircleConst.Circle
+                }));
+
+                result.AddRange(allPolygons.Select(x => new GeoSearchModel()
+                {
+                    ID = x.ID,
+                    Name = x.Name,
+                    Icon = x.IsRectangle ? MapIconPolygonConst.Rectangle : MapIconPolygonConst.Polygon,
+                    Latitude = x.Centroid.lat,
+                    Longitude = x.Centroid.lng,
+                    MapLayer = x.IsRectangle ? MapLayerPolygonConst.Rectangle : MapLayerPolygonConst.Polygon
+                }));
+
+                result.AddRange(polylines.Select(x => new GeoSearchModel()
+                {
+                    ID = x.ID,
+                    Name = x.Name,
+                    Icon = x.Type.Icon,
+                    Latitude = x.Latitude,
+                    Longitude = x.Longitude,
+                    MapLayer = x.Type.MapName
+                }));
+
+                if (!result.Any())
+                {
+                    response.Data = $"<center style='color :red '>Data is not found with '{keyWord}' key word</center>";
+                }
+                else
+                {
+                    string htmlContent = string.Empty;
+                    foreach (var item in result)
+                    {
+                        htmlContent = htmlContent + $"<div class='row item-suggestions' style='color :white ' onclick='fly(`{item.ID}`, {item.Latitude}, {item.Longitude} ,`{item.MapLayer}`)'><img src='" + item.Icon + "' class='icon-suggestion'/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + item.Name.ToString() + "</div>";
+                    }
+                    response.Data = htmlContent;
+                }
+                response.Success = true;
             }
             catch (Exception ex)
             {

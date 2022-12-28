@@ -50,7 +50,7 @@
 <script src="~/js/hightlight/leaflet.marker.highlight.js"></script>
 
 <div class="text-center" style="height: 590px; position:relative">
-    <div id="GISMap" style="height: 590px;" class="leaflet-container leaflet-touch leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom">
+    <div id="GISMap" style="height: 570px;" class="leaflet-container leaflet-touch leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom">
 
     </div>
     <div style="position:absolute; right:0px; top:0px; height:100%;max-height: inherit;">
@@ -61,21 +61,16 @@
                     <center><b><span style="color : white">SEARCH TOOL</span></b></center>
                     <div class="col-12" style="margin-top : 15px;">
                         <div class="custom-search">
-                            <input type="text" class="custom-search-input" placeholder="Enter Name">
-                            <button class="custom-search-botton">Search</button>
+                            <input type="text" class="custom-search-input" id="searchMap-typing" placeholder="Enter Name">
+                            <button class="custom-search-botton" onclick="SearchFromMap()">Search</button>
                         </div>
                     </div>
                 </div>
 
                 <hr />
                 <div class="row">
-                    <div class="col-md-12">
-                        <div class="col-md-1">
-                        </div>
-                        <div class="col-md-10" id="resultSearch">
-                        </div>
-                        <div class="col-md-1">
-                        </div>
+                    <div class="col-md-12" id="resultSearch">
+
                     </div>
                 </div>
             </div>
@@ -502,22 +497,20 @@
 
     // #region Polyline
     function EditPolyline(idPolyline) {
-        GetPolyline(idPolyline, null, null, null);
+        GetPolyline(idPolyline, null, null);
     }
 
 
-    function GetPolyline(id, arrLatLngs, length , central) {
+    function GetPolyline(id, arrLatLngs, length) {
 
         let raw = {
             ID: id,
             CablineLength: '',
-            CentralLatlng: '',
             LatLongs: []
         };
 
         if (raw.ID == null || raw.ID == '') {
             raw.CablineLength = length;
-            raw.CentralLatlng = central;
             raw.LatLongs = arrLatLngs;
         }
 
@@ -582,7 +575,6 @@
                     ID: $('#form-polyline-input-id').val(),
                     Name: $('#form-polyline-input-name').val(),
                     CablineLength: $('#form-polyline-input-length').val(),
-                    CentralLatlng: $('#form-polyline-input-central').val(),
                     TypeID: $('#form-polyline-input-type').val(),
                     LatLongs : collectionLatLngsLocal
                 }
@@ -614,7 +606,7 @@
                                     id : $response.Data.ID
                                 };
 
-                                var polyline = L.polyline([$response.Data.OnlyLatLongs], inforPolyline);
+                                var polyline = L.polyline([$response.Data.LatLongs], inforPolyline);
 
                                 polyline.bindPopup($response.Data.PopupContent);
 
@@ -632,8 +624,6 @@
                             }
                             else //Update case
                             {
-                                let LayerLngs = $response.Data.Polyline.OnlyLatLongs;
-
                                 if ($response.Data.Polyline.MapName == $response.Data.OldMapLayer) //Not change type . only need change popup
                                 {
                                     window[$response.Data.Polyline.MapName].eachLayer(function (layer) {
@@ -668,7 +658,7 @@
                                         id : $response.Data.Polyline.ID
                                     };
 
-                                    let polyline = L.polyline([LayerLngs], InforPolyline);
+                                    let polyline = L.polyline([$response.Data.Polyline.LatLongs], InforPolyline);
 
                                     polyline.bindPopup($response.Data.Polyline.PopupContent);
 
@@ -1495,8 +1485,54 @@
         return formatted;
     };
 
-    window.onload = function () {
+    function SearchFromMap() {
+        let word = $("#searchMap-typing").val();
+        if(word == null || word == '') {
+            Toast.fire({
+                icon: 'error',
+                title: 'Please enter a search keyword'
+            });
+            let targetDiv = $('#resultSearch');
+            targetDiv.empty();
+            return;
+        }
+        $.ajax({
+            type: "GET",
+            url: "/Geo/SearchGeoData",
+            beforeSend: function () {
+                $(".loading-bar").show();
+            },
+            complete: function () {
+                $(".loading-bar").hide();
+            },
+            data: {
+                keyWord: word
+            },
+            success: function (response) {
+                var $response = response;
+                if ($response.Success == true) {
+                    let targetDiv = $('#resultSearch');
+                    targetDiv.empty();
+                    targetDiv.html($response.Data);
+                }
+                else {
+                    toastr.error($response.Message);
+                }
+            }
+        });
+    }
 
+    function fly(id ,lat, long, mapLayer) {
+        map.flyTo([lat, long], 15);
+        window[mapLayer].eachLayer(function (layer) {
+            if (layer.options.id == id) {
+               layer.openPopup();
+                return;
+            }
+        });
+    }
+
+    window.onload = function () {
         $.ajax({
             type: "GET",
             beforeSend: function () {
@@ -1562,40 +1598,15 @@
                             GetMarker('', data.LatLngs[0].lat, data.LatLngs[0].lng);
                         }
                         else if (layerType === 'Polyline') {
-                            let centralLatlngs = layer.getBounds().getCenter().lat + ',' + layer.getBounds().getCenter().lng;
-
-                            CablineLatlngsCU = [];
-                            let order = 1;
-                            layer._latlngs.forEach(function (item) {
-                                let itemInject = {
-                                    Order: order,
-                                    Latitude: item.lat,
-                                    Longitude: item.lng
-                                };
-                                CablineLatlngsCU.push(itemInject);
-                                order++;
-                            });
                             let lengthCabline = distance(layer._latlngs);
                             
-                            GetPolyline('', CablineLatlngsCU, lengthCabline, centralLatlngs);
+                            GetPolyline('', layer._latlngs, lengthCabline);
                         }
                         else if (layerType === 'Polygon') 
                         {
                             let area = L.GeometryUtil.geodesicArea(layer._latlngs[0]);
                             let length = distance(layer._latlngs[0]);
                             GetPolygon('', layer._latlngs[0], layer.options);
-
-                            //let InforPolygon= layer.options;
-                            //InforPolygon.id = "123456789966";
-                            //InforPolygon.color = "#3388ff";
-                            //InforPolygon.opacity = 0.5;
-                            //InforPolygon.weight = 2;
-                            //InforPolygon.fillColor = 'red';
-                            //InforPolygon.fillOpacity = 0.5;
-
-                            //let polygon = L.polygon([layer._latlngs[0]], InforPolygon).addTo(map);
-                            //polygon.bindPopup('hello world');
-                            //drawnItems.addLayer(polygon);
                         }
                         else if (layerType === 'Circle') 
                         {
@@ -1637,25 +1648,11 @@
                                     let latLngs = layer._poly._latlngs;
 
                                     let centralLatlngs = layer._poly.getBounds().getCenter().lat + ',' + layer._poly.getBounds().getCenter().lng;
-
-                                    let CablineLatlngsCU = [];
-                                    let order = 1;
-                                    latLngs[0].forEach(function (item) {
-                                        let itemInject = {
-                                            Order: order,
-                                            Latitude: item.lat,
-                                            Longitude: item.lng
-                                        };
-                                        CablineLatlngsCU.push(itemInject);
-                                        order++;
-                                    });
                                     let lengthCabline = distance(latLngs[0]);
-
                                     let raw = {
                                         ID: idPolyline,
                                         CablineLength: lengthCabline,
-                                        CentralLatlng: centralLatlngs,
-                                        LatLongs: CablineLatlngsCU
+                                        LatLongs: latLngs[0]
                                     };
 
                                     UpdateLocationPolyline(raw);
@@ -1727,7 +1724,7 @@
                             id : ArrCabline[i].ID
                         };
 
-                        let polyline = L.polyline([ArrCabline[i].OnlyLatLongs], InforCabline);
+                        let polyline = L.polyline([ArrCabline[i].LatLongs], InforCabline);
 
                         polyline.bindPopup(ArrCabline[i].PopupContent);
                         window[ArrCabline[i].MapName].addLayer(polyline);

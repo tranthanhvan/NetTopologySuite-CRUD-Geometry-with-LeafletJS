@@ -67,7 +67,7 @@ namespace GIS_Technolory.Serivces
 
         public async Task<bool> Delete(string id)
         {
-            Polyline target = await _Context.Polylines.Include(x=>x.LatLongs).FirstOrDefaultAsync(x => x.ID.Equals(id));
+            Polyline target = await _Context.Polylines.FirstOrDefaultAsync(x => x.ID.Equals(id));
             if (target is null)
                 return false;
             else
@@ -80,17 +80,17 @@ namespace GIS_Technolory.Serivces
 
         public async Task<Polyline> Get(string id)
         {
-            return await _Context.Polylines.Include(x=>x.Type).Include(x=>x.LatLongs.OrderBy(x => x.Order)).FirstOrDefaultAsync(x => x.ID.Equals(id));
+            return await _Context.Polylines.Include(x=>x.Type).FirstOrDefaultAsync(x => x.ID.Equals(id));
         }
 
         public async Task<IEnumerable<Polyline>> GetList(string name = null)
         {
             if (string.IsNullOrEmpty(name))
-                return await _Context.Polylines.Include(x => x.Type).Include(x => x.LatLongs.OrderBy(x => x.Order)).ToListAsync();
+                return await _Context.Polylines.Include(x => x.Type).ToListAsync();
             else
             {
                 string search = name.Trim().ToLower();
-                return await _Context.Polylines.Include(x => x.Type).Include(x=>x.LatLongs.OrderBy(x=>x.Order)).Where(x => x.Name.ToLower().Contains(search)).ToListAsync();
+                return await _Context.Polylines.Include(x => x.Type).Where(x => x.Name.ToLower().Contains(search)).ToListAsync();
             }
         }
 

@@ -2,6 +2,12 @@ html {
   font-size: 14px;
 }
 
+html, body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden
+}
+
 @media (min-width: 768px) {
   html {
     font-size: 16px;
@@ -162,4 +168,19 @@ body.loading .loading-bar {
 .act-popup-leaflet {
     margin-left: auto !important;
     margin-right: 0 !important;
+}
+
+.icon-suggestion {
+    width: auto !important;
+}
+
+.item-suggestions {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+div.item-suggestions:hover {
+    background: #D7D7D7;
 }
