@@ -1143,9 +1143,9 @@
                 if ($response.Success == true) {
 
                     $("#container-modal-body-polygon").html("");
-                    $("#container-modal-body-polygon").html($response.Data);
+                    $("#container-modal-body-polygon").html($response.Data.Html);
 
-                    collectionLatLngsLocal = arrLatLngs;
+                    collectionLatLngsLocal = $response.Data.LatLongs;
 
                     SetValidFormPolygon();
 

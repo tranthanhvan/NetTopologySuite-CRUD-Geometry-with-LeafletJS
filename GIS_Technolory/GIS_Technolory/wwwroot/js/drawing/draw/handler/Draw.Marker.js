@@ -1,3 +1,11 @@
+var IconMarker = L.Icon.extend({
+	options: {
+		//shadowUrl: '/images/marker-shadow.png',
+		iconAnchor: new L.Point(L.Draw.constants.anchorSize, L.Draw.constants.anchorSize),
+		iconSize: new L.Point(L.Draw.constants.iconSize, L.Draw.constants.iconSize),
+		iconUrl: '/images/icon-place-marker.png'
+	}
+});
 /**
  * @class L.Draw.Marker
  * @aka Draw.Marker
@@ -9,7 +17,7 @@ L.Draw.Marker = L.Draw.Feature.extend({
 	},
 
 	options: {
-		icon: new L.Icon.Default(),
+		icon: new IconMarker(),
 		repeatMode: false,
 		zIndexOffset: 2000 // This should be > than the highest z-index any markers
 	},

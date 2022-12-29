@@ -23,13 +23,8 @@ namespace GIS_Technolory.Controllers
             try
             {
                 uploadRecord.LatLongs.Add(uploadRecord.LatLongs.FirstOrDefault());
-                uploadRecord.LatLongs.Reverse();
-                var linearRing = new NetTopologySuite.Geometries.LinearRing(uploadRecord.LatLongs.Select(m => new NetTopologySuite.Geometries.Coordinate
-                {
-                    X = m.lng,
-                    Y = m.lat
-                }).ToArray());
-                response.Data = await _PolygonService.Create(new Polygon()
+                var linearRing = new NetTopologySuite.Geometries.LinearRing(GetArrayCoordinate(uploadRecord.LatLongs));
+                var polygonCreate = new Polygon()
                 {
                     ID = Guid.NewGuid().ToString(),
                     Name = uploadRecord.Name,
@@ -39,7 +34,8 @@ namespace GIS_Technolory.Controllers
                     FillColor = uploadRecord.FillColor,
                     FillOpacity = uploadRecord.FillOpacity,
                     Location = new NetTopologySuite.Geometries.Polygon(linearRing) { SRID = 4326 }
-                });
+                };
+                response.Data = await _PolygonService.Create(polygonCreate);
                 response.Success = response.Data != null;
                 response.Message = "Create Polygon is successful";
             }
@@ -159,30 +155,31 @@ namespace GIS_Technolory.Controllers
             return Ok(response);
         }
 
-
         [HttpPost]
         public async Task<IActionResult> GetPolygon([FromBody] PolygonModel input)
         {
-            var response = new Response<string>();
+            var response = new Response<object>();
             try
             {
                 var Polygon = await _PolygonService.Get(input.ID);
                 PolygonModel modelResult;
                 if (Polygon is null)
                 {
-                    input.LatLongs.Add(input.LatLongs.FirstOrDefault());
-                    input.LatLongs.Reverse();
-                    var coordinates = input.LatLongs.Select(m => new NetTopologySuite.Geometries.Coordinate
-                    {
-                        X = m.lng,
-                        Y = m.lat
-                    }).ToArray();
-
-                    var linearRing = new NetTopologySuite.Geometries.LinearRing(coordinates);
+                    input.LatLongs.Add(input.LatLongs.FirstOrDefault()); //needs to be closed
+                    var linearRing = new NetTopologySuite.Geometries.LinearRing(GetArrayCoordinate(input.LatLongs));
                     var tempPlg = new Polygon()
                     {
                         Location = new NetTopologySuite.Geometries.Polygon(linearRing) { SRID = 4326 }
                     };
+                    if(tempPlg.NeedReverse) // Reverse
+                    {
+                        input.LatLongs.Remove(input.LatLongs.LastOrDefault());
+                        input.LatLongs.Reverse();
+                        input.LatLongs.Add(input.LatLongs.FirstOrDefault());
+                        linearRing = new NetTopologySuite.Geometries.LinearRing(GetArrayCoordinate(input.LatLongs));
+                        tempPlg.Location = new NetTopologySuite.Geometries.Polygon(linearRing) { SRID = 4326 };
+                    }
+
                     modelResult = new PolygonModel()
                     {
                         ID = string.Empty,
@@ -222,8 +219,13 @@ namespace GIS_Technolory.Controllers
                         IsRectangle = Polygon.IsRectangle,
                     };
                 }
-                response.Data = await this.RenderViewAsync("_DetailPolygon", modelResult, true);
-                response.Success = !string.IsNullOrEmpty(response.Data);
+                string htmlContent = await this.RenderViewAsync("_DetailPolygon", modelResult, true);
+                response.Data = new
+                {
+                    Html = htmlContent,
+                    LatLongs = modelResult.LatLongs
+                };
+                response.Success = true;
             }
             catch (Exception ex)
             {
@@ -231,6 +233,15 @@ namespace GIS_Technolory.Controllers
                 response.Message = ex.Message + ex.InnerException;
             }
             return Ok(response);
+        }
+
+        private NetTopologySuite.Geometries.Coordinate[] GetArrayCoordinate(List<LatLongModel> Latlngs)
+        {
+            return Latlngs.Select(m => new NetTopologySuite.Geometries.Coordinate
+            {
+                X = m.lng,
+                Y = m.lat
+            }).ToArray();
         }
     }
 }

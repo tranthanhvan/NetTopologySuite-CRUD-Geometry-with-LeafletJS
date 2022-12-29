@@ -139,5 +139,8 @@ namespace GIS_Technolory.Entities
                 }
             }
         }
+
+        [NotMapped]
+        public bool NeedReverse => Area < 0;
     }
 }
