@@ -43,6 +43,8 @@
 <script src="~/js/drawing/edit/handler/Edit.CircleMarker.js"></script>
 <script src="~/js/drawing/edit/handler/Edit.Circle.js"></script>
 
+<script src="~/js/subgroup/subgroup.js"></script>
+
 <script src="~/js/geocoder/control.geocoder.js"></script>
 <link href="~/js/geocoder/control.geocoder.css" rel="stylesheet" />
 
@@ -53,9 +55,9 @@
     <div id="GISMap" style="height: 570px;" class="leaflet-container leaflet-touch leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom">
 
     </div>
-    <div style="position:absolute; right:0px; top:0px; height:100%;max-height: inherit;">
+    <div style="position:absolute; right:0px; top:0px; height:100%;max-height: 570px;">
         <div id="panel">
-            <div style="margin-top : 60px;">
+            <div>
                 <div class="row">
                     <hr />
                     <center><b><span style="color : white">SEARCH TOOL</span></b></center>
@@ -69,7 +71,7 @@
 
                 <hr />
                 <div class="row">
-                    <div class="col-md-12" id="resultSearch">
+                    <div class="col-md-12" id="resultSearch" style="height:410px;overflow: auto;">
 
                     </div>
                 </div>
@@ -109,10 +111,10 @@
                 <h5 class="modal-title" id="exampleModalLabel">Polyline detail</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body" id="container-modal-body-polyline" style="height: 500px;overflow-y: auto;">
+            <div class="modal-body" id="container-modal-body-polyline" style="max-height: 500px;">
 
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer" style="margin-top:30px;">
                 <button type="submit" class="btn btn-primary" form="form-polyline-input">Save changes</button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
@@ -1553,7 +1555,7 @@
                     };
                     for (var i = 0; i < Types.length; i++) {
                         //create variable with regist featuremap
-                        paramsJson[Types[i].Name] = window[Types[i].MapName] = L.featureGroup().addTo(map);
+                        paramsJson[Types[i].Name] = window[Types[i].MapName] = L.featureGroup.subGroup(drawnItems).addTo(map);
                     }
 
                     L.control.layers({
@@ -1562,11 +1564,10 @@
                         "The free size map": mapWord
                     }, paramsJson, { position: 'topleft', collapsed: false }).addTo(map);
 
-
                     map.addControl(new L.Control.Draw({
                         edit: {
                             featureGroup: drawnItems,
-                            remove: false ,
+                            remove: false,
                             poly: {
                                 allowIntersection: false
                             }

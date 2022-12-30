@@ -3,7 +3,7 @@
 
 <form id="form-polygon-input" name="form-polygon-input">
     <input type="text" id="form-polygon-input-id" maxlength="250" class="form-control" value="@Model.ID" hidden />
-    <div class="row padding-form">
+    <div class="row padding-form" style="padding-top: 0!important;">
         <div class="col-md-4">
             <label>Type :</label>
         </div>
@@ -67,24 +67,18 @@
 
     <div class="row padding-form">
         <div class="col-md-4">
-            <label>Perimeter :</label>
+            <label>Perimeter/Area :</label>
         </div>
-        <div class="col-md-8">
+        <div class="col-md-4">
             <input type="text" id="form-polygon-input-length" maxlength="50" class="form-control" value="@Model.LengthDisplay" readonly />
         </div>
-    </div>
-
-    <div class="row padding-form">
         <div class="col-md-4">
-            <label>Area :</label>
-        </div>
-        <div class="col-md-8">
-            <input type="text" id="form-polygon-input-central" maxlength="50" class="form-control" value="@Model.AreaDisplay" readonly />
+            <input type="text" maxlength="50" class="form-control" value="@Model.AreaDisplay" readonly />
         </div>
     </div>
 
     <div class="row padding-form">
-        <div class="col-md-12">
+        <div class="col-md-12" style="height: 300px;overflow: auto;">
             <table class="table" id="form-Polygon-table-data-latlngs">
                 <thead>
                     <tr>
