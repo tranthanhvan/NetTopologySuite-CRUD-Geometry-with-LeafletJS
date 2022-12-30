@@ -49,7 +49,8 @@ L.drawVersion = '0.4.2';
 L.Draw = {};
 L.Draw.constants = {
 	iconSize: 40,
-	anchorSize: 10
+	anchorSize: 10,
+	iconSizeHover: 45
 }
 
 /**

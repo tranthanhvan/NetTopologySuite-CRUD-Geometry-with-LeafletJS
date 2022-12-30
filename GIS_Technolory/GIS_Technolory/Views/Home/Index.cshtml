@@ -192,7 +192,7 @@
     var collectionLatLngsLocal = [];
 
     //Draw & edit tool
-    var drawnItems = L.featureGroup().addTo(map);
+    var drawItems = L.featureGroup().addTo(map);
 
     var geocoder = L.Control.geocoder({
         defaultMarkGeocode: false
@@ -206,8 +206,6 @@
             bbox.getSouthWest(),
         ]).addTo(map);
 
-        //var middleLatlngs = poly.getBounds().getCenter();
-        //map.flyTo(new L.LatLng(middleLatlngs.lat, middleLatlngs.lng));
         map.fitBounds(poly.getBounds());
 
         setTimeout(function () {
@@ -250,8 +248,6 @@
                             window[$response.Data.Type.MapName].eachLayer(function (layer) {
                                 if (layer.options.id == $response.Data.ID) {
                                     window[$response.Data.Type.MapName].removeLayer(layer);
-                                    drawnItems.removeLayer(layer);
-
                                     Toast.fire({
                                         icon: 'success',
                                         title: $response.Message
@@ -371,7 +367,6 @@
                             if (url == '/Marker/Create') {
                                 let MarkerInfo = L.Icon.extend({
                                     options: {
-                                        //shadowUrl: '/images/marker-shadow.png',
                                         iconAnchor: new L.Point(L.Draw.constants.anchorSize, L.Draw.constants.anchorSize),
                                         iconSize: new L.Point(L.Draw.constants.iconSize, L.Draw.constants.iconSize),
                                         iconUrl: $response.Data.Type.Icon
@@ -385,7 +380,6 @@
                                     }).bindPopup($response.Data.PopupContent);
 
                                 window[$response.Data.Type.MapName].addLayer(CreateMarker);
-                                drawnItems.addLayer(CreateMarker);
 
                                 let modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-marker'))
                                 modal.hide();
@@ -399,9 +393,7 @@
                             {
                                 window[$response.Data.OldMap].eachLayer(function (layer) {
                                     if (layer.options.id == $response.Data.Marker.ID) {
-
                                         window[$response.Data.OldMap].removeLayer(layer);
-                                        drawnItems.removeLayer(layer);
 
                                         let MarkerInfo = L.Icon.extend({
                                             options: {
@@ -419,7 +411,6 @@
 
 
                                         window[$response.Data.Marker.Type.MapName].addLayer(MarkerReplace);
-                                        drawnItems.addLayer(MarkerReplace);
                                         return;
                                     }
                                 });
@@ -605,7 +596,8 @@
                                 let inforPolyline = {
                                     color: $response.Data.ColorLine,
                                     weight: $response.Data.WeightLine,
-                                    id : $response.Data.ID
+                                    id : $response.Data.ID,
+                                    colorDefault : $response.Data.ColorLine
                                 };
 
                                 var polyline = L.polyline([$response.Data.LatLongs], inforPolyline);
@@ -613,7 +605,6 @@
                                 polyline.bindPopup($response.Data.PopupContent);
 
                                 window[$response.Data.MapName].addLayer(polyline);
-                                drawnItems.addLayer(polyline);
 
                                 let modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-polyline'))
                                 modal.hide();
@@ -648,7 +639,6 @@
                                     window[$response.Data.OldMapLayer].eachLayer(function (layer) {
                                         if (layer.options.id == $response.Data.Polyline.ID) {
                                             window[$response.Data.OldMapLayer].removeLayer(layer);
-                                            drawnItems.removeLayer(layer);
                                             return;
                                         }
                                     });
@@ -657,7 +647,8 @@
                                     let InforPolyline = {
                                         color: $response.Data.Polyline.ColorLine,
                                         weight: $response.Data.Polyline.WeightLine,
-                                        id : $response.Data.Polyline.ID
+                                        id : $response.Data.Polyline.ID,
+                                        colorDefault : $response.Data.Polyline.ColorLine
                                     };
 
                                     let polyline = L.polyline([$response.Data.Polyline.LatLongs], InforPolyline);
@@ -665,7 +656,6 @@
                                     polyline.bindPopup($response.Data.Polyline.PopupContent);
 
                                     window[$response.Data.Polyline.MapName].addLayer(polyline);
-                                    drawnItems.addLayer(polyline);
 
                                     let modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-polyline'))
                                     modal.hide();
@@ -730,7 +720,6 @@
                             window[$response.Data.MapName].eachLayer(function (layer) {
                                 if (layer.options.id == $response.Data.ID) {
                                     window[$response.Data.MapName].removeLayer(layer);
-                                    drawnItems.removeLayer(layer);
                                     return;
                                 }
                             });
@@ -935,18 +924,17 @@
                                 inforCircle.weight = $response.Data.WeightBorder;
                                 inforCircle.fillColor = $response.Data.FillColor;
                                 inforCircle.fillOpacity = $response.Data.FillOpacity;
+                                inforCircle.colorDefault = $response.Data.color;
 
                                 if($response.Data.Type == 'Circle') {
                                     let cirlce = L.circle([$response.Data.Latitude,$response.Data.Longitude], inforCircle);
                                     cirlce.bindPopup($response.Data.PopupContent);
                                     window[$response.Data.MapLayer].addLayer(cirlce);
-                                    drawnItems.addLayer(cirlce);
                                 }
                                 else {
                                     let cirlceMarker = L.circleMarker([$response.Data.Latitude,$response.Data.Longitude], inforCircle);
                                     cirlceMarker.bindPopup($response.Data.PopupContent);
                                     window[$response.Data.MapLayer].addLayer(cirlceMarker);
-                                    drawnItems.addLayer(cirlceMarker);
                                 }
                             }
                             else //Update case
@@ -958,16 +946,13 @@
                                         layer.options.weight = $response.Data.WeightBorder;
                                         layer.options.fillColor = $response.Data.FillColor;
                                         layer.options.fillOpacity = $response.Data.FillOpacity;
+                                        layer.options.colorDefault = $response.Data.ColorCircle;
                                         layer.bindPopup($response.Data.PopupContent);
 
                                         let cloneReplace = layer; //because for some reason changing the options doesn't work
 
                                         window[$response.Data.MapLayer].removeLayer(layer); //Remove old 
-                                        drawnItems.removeLayer(layer);
-
                                         window[$response.Data.MapLayer].addLayer(cloneReplace); //Add clone
-                                        drawnItems.addLayer(cloneReplace);
-
                                         return;
                                     }
                                 });
@@ -1083,7 +1068,6 @@
                             window[$response.Data.MapLayer].eachLayer(function (layer) {
                                 if (layer.options.id == $response.Data.ID) {
                                     window[$response.Data.MapLayer].removeLayer(layer);
-                                    drawnItems.removeLayer(layer);
                                     Toast.fire({
                                         icon: 'success',
                                         title: $response.Message
@@ -1251,12 +1235,12 @@
                                     opacity : $response.Data.Opacity,
                                     weight : $response.Data.WeightBorder,
                                     fillColor : $response.Data.FillColor,
-                                    fillOpacity : $response.Data.FillOpacity
+                                    fillOpacity : $response.Data.FillOpacity,
+                                    colorDefault : $response.Data.Color
                                 };
                                 let polygon = L.polygon([$response.Data.LatLngs], inforPolygon);
                                 polygon.bindPopup($response.Data.PopupContent);
                                 window[$response.Data.MapLayer].addLayer(polygon);
-                                drawnItems.addLayer(polygon);
                             }
                             else //Update case
                             {
@@ -1267,16 +1251,13 @@
                                         layer.options.weight = $response.Data.WeightBorder;
                                         layer.options.fillColor = $response.Data.FillColor;
                                         layer.options.fillOpacity = $response.Data.FillOpacity;
+                                        layer.options.colorDefault = $response.Data.Color;
                                         layer.bindPopup($response.Data.PopupContent);
 
                                         let cloneReplace = layer; //because for some reason changing the options doesn't work
 
                                         window[$response.Data.MapLayer].removeLayer(layer); //Remove old
-                                        drawnItems.removeLayer(layer);
-
                                         window[$response.Data.MapLayer].addLayer(cloneReplace); //Add clone
-                                        drawnItems.addLayer(cloneReplace);
-
                                         return;
                                     }
                                 });
@@ -1334,17 +1315,11 @@
 
                     window[$response.Data.OldLayer].eachLayer(function (layer) {
                         if (layer.options.id == $response.Data.Polygon.ID) {
-                            
                             layer.bindPopup($response.Data.Polygon.PopupContent);
 
                             let cloneReplace = layer;
-
                             window[$response.Data.OldLayer].removeLayer(layer); //Remove old
-                            drawnItems.removeLayer(layer);
-
                             window[$response.Data.Polygon.MapLayer].addLayer(cloneReplace); //Add clone
-                            drawnItems.addLayer(cloneReplace);
-
                             return;
                         }
                     });
@@ -1403,7 +1378,6 @@
                             window[$response.Data.MapLayer].eachLayer(function (layer) {
                                 if (layer.options.id == $response.Data.ID) {
                                     window[$response.Data.MapLayer].removeLayer(layer);
-                                    drawnItems.removeLayer(layer);
                                     Toast.fire({
                                         icon: 'success',
                                         title: $response.Message
@@ -1529,9 +1503,20 @@
         window[mapLayer].eachLayer(function (layer) {
             if (layer.options.id == id) {
                layer.openPopup();
-                return;
+               return;
             }
         });
+    }
+
+    function culori_random() 
+    {
+        var litere = '0123456789ABCDEF'.split('');
+        var culori = '#';
+        for (var i = 0; i < 6; i++ ) 
+        {
+           culori += litere[Math.round(Math.random() * 15)];
+        }
+        return culori;
     }
 
     window.onload = function () {
@@ -1555,7 +1540,7 @@
                     };
                     for (var i = 0; i < Types.length; i++) {
                         //create variable with regist featuremap
-                        paramsJson[Types[i].Name] = window[Types[i].MapName] = L.featureGroup.subGroup(drawnItems).addTo(map);
+                        paramsJson[Types[i].Name] = window[Types[i].MapName] = L.featureGroup.subGroup(drawItems).addTo(map);
                     }
 
                     L.control.layers({
@@ -1566,7 +1551,7 @@
 
                     map.addControl(new L.Control.Draw({
                         edit: {
-                            featureGroup: drawnItems,
+                            featureGroup: drawItems,
                             remove: false,
                             poly: {
                                 allowIntersection: false
@@ -1659,7 +1644,6 @@
                                     UpdateLocationPolyline(raw);
                                 }
                                 else if(getLayerType(layer._poly) == 'Polygon') {
-
                                     let id = layer._poly.options.id;
                                     let latLngs = layer._poly._latlngs[0];
 
@@ -1672,25 +1656,21 @@
                                 }
                             }
                             else if(getLayerType(layer._shape) == 'CircleMarker') {
-
                                 let raw = {
                                     ID: item.options.id,
                                     Latitude : item._latlng.lat,
                                     Longitude: item._latlng.lng,
                                     Radius : 0
                                 };
-
                                 UpdateLocationCircle(raw);
                             }
                             else if(getLayerType(layer._shape) == 'Circle') {
-
                                 let raw = {
                                     ID: item.options.id,
                                     Latitude : item._latlng.lat,
                                     Longitude: item._latlng.lng,
                                     Radius: item._mRadius
                                 };
-
                                 UpdateLocationCircle(raw);
                             }
                         });
@@ -1699,7 +1679,6 @@
                     //Markers
                     var Arr = $response.Data.Markers;
                     for (i = 0; i < Arr.length; i++) {
-
                         var MarkerDefine = L.Icon.extend({
                             options: {
                                 iconAnchor: new L.Point(L.Draw.constants.anchorSize, L.Draw.constants.anchorSize),
@@ -1711,8 +1690,6 @@
                         var mker = L.marker([Arr[i].Lat, Arr[i].Long], { icon: new MarkerDefine(),id : Arr[i].ID });
                         mker.bindPopup(Arr[i].PopupContent);
                         window[Arr[i].MapName].addLayer(mker);
-
-                        drawnItems.addLayer(mker);
                     }
 
                     //Polylines
@@ -1722,14 +1699,14 @@
                         let InforCabline = {
                             color: ArrCabline[i].ColorLine,
                             weight: ArrCabline[i].WeightLine,
-                            id : ArrCabline[i].ID
+                            id : ArrCabline[i].ID,
+                            colorDefault: ArrCabline[i].ColorLine
                         };
 
                         let polyline = L.polyline([ArrCabline[i].LatLongs], InforCabline);
 
                         polyline.bindPopup(ArrCabline[i].PopupContent);
                         window[ArrCabline[i].MapName].addLayer(polyline);
-                        drawnItems.addLayer(polyline);
                     }
 
                     var ArrCircles = $response.Data.Circles;
@@ -1742,13 +1719,13 @@
                             weight : ArrCircles[i].WeightBorder,
                             fillColor : ArrCircles[i].FillColor,
                             fillOpacity : ArrCircles[i].FillOpacity,
-                            radius : ArrCircles[i].Radius
+                            radius : ArrCircles[i].Radius,
+                            colorDefault : ArrCircles[i].ColorCircle
                         }
                         
                         let cirlce = L.circle([ArrCircles[i].Latitude,ArrCircles[i].Longitude], inforCircle);
                         cirlce.bindPopup(ArrCircles[i].PopupContent);
                         window[ArrCircles[i].MapLayer].addLayer(cirlce);
-                        drawnItems.addLayer(cirlce);
                     }
 
 
@@ -1761,13 +1738,13 @@
                             opacity : ArrCircleMarkers[i].Opacity,
                             weight : ArrCircleMarkers[i].WeightBorder,
                             fillColor : ArrCircleMarkers[i].FillColor,
-                            fillOpacity : ArrCircleMarkers[i].FillOpacity
+                            fillOpacity : ArrCircleMarkers[i].FillOpacity,
+                            colorDefault : ArrCircles[i].ColorCircle
                         }
                         
                         let cirlceMarker = L.circleMarker([ArrCircleMarkers[i].Latitude,ArrCircleMarkers[i].Longitude], infor);
                         cirlceMarker.bindPopup(ArrCircleMarkers[i].PopupContent);
                         window[ArrCircleMarkers[i].MapLayer].addLayer(cirlceMarker);
-                        drawnItems.addLayer(cirlceMarker);
                     }
 
                     var ArrPolygons = $response.Data.Polygons;
@@ -1779,14 +1756,58 @@
                             opacity : ArrPolygons[i].Opacity,
                             weight : ArrPolygons[i].WeightBorder,
                             fillColor : ArrPolygons[i].FillColor,
-                            fillOpacity : ArrPolygons[i].FillOpacity
+                            fillOpacity : ArrPolygons[i].FillOpacity,
+                            colorDefault : ArrPolygons[i].Color
                         }
                         
                         let polygon = L.polygon([ArrPolygons[i].LatLongs], inforPolygon);
                         polygon.bindPopup(ArrPolygons[i].PopupContent);
                         window[ArrPolygons[i].MapLayer].addLayer(polygon);
-                        drawnItems.addLayer(polygon);
                     }
+
+
+                    drawItems.on('mouseover', function (event) {
+                        debugger;
+                        var layer = event.layer,
+                            layerType = getLayerType(layer);
+                        if(layerType == 'Marker') {
+                            let highlight = L.Icon.extend({
+                                options: {
+                                    iconAnchor: new L.Point(L.Draw.constants.anchorSize, L.Draw.constants.anchorSize),
+                                    iconSize: new L.Point(L.Draw.constants.iconSizeHover, L.Draw.constants.iconSizeHover),
+                                    iconUrl: Object.values(event.layer.options.icon)[0].iconUrl
+                                },
+                            });
+                            layer.setIcon(new highlight());
+                        }
+                        else {
+                            let culoare = culori_random();
+                            layer.setStyle({
+                                'color': culoare
+                            });
+                        }
+                        
+                    });
+                    drawItems.on('mouseout', function (event) {
+                        debugger;
+                        var layer = event.layer,
+                            layerType = getLayerType(layer);
+                        if(layerType == 'Marker') {
+                            let highlight = L.Icon.extend({
+                                options: {
+                                    iconAnchor: new L.Point(L.Draw.constants.anchorSize, L.Draw.constants.anchorSize),
+                                    iconSize: new L.Point(L.Draw.constants.iconSize, L.Draw.constants.iconSize),
+                                    iconUrl: Object.values(event.layer.options.icon)[0].iconUrl
+                                },
+                            });
+                            layer.setIcon(new highlight());
+                        }
+                        else {
+                            layer.setStyle({
+                                'color': layer.options.colorDefault
+                            });
+                        }
+                    });
                 }
                 else {
                     alert('error when get geotdata');
