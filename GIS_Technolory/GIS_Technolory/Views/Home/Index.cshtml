@@ -1499,7 +1499,7 @@
     }
 
     function fly(id ,lat, long, mapLayer) {
-        map.flyTo([lat, long], 15);
+        map.flyTo([lat, long], 17);
         window[mapLayer].eachLayer(function (layer) {
             if (layer.options.id == id) {
                layer.openPopup();

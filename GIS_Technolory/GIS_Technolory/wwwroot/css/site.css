@@ -177,8 +177,10 @@ body.loading .loading-bar {
 .item-suggestions {
     padding-top: 10px;
     padding-bottom: 10px;
-    margin-left: 20px;
-    margin-right: 20px;
+    display: -webkit-inline-box;
+    margin-left: 0;
+    word-wrap: break-word;
+    width: 100% !important;
 }
 
 div.item-suggestions:hover {
