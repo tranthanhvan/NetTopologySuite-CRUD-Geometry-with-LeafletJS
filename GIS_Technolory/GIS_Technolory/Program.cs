@@ -2,6 +2,7 @@ using GIS_Technolory.DBAccess;
 using GIS_Technolory.Serivces;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,6 +44,14 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+app.Use(async (context, next) =>
+{
+    CultureInfo customCulture = (CultureInfo)Thread.CurrentThread.CurrentCulture.Clone();
+    customCulture.NumberFormat.NumberDecimalSeparator = ".";
+    Thread.CurrentThread.CurrentCulture = customCulture;
+    await next();
+});
 
 app.UseRouting();
 
