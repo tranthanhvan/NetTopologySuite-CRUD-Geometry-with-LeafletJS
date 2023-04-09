@@ -915,7 +915,7 @@
                     },
                     data: JSON.stringify(model),
                     success: function (response) {
-                        debugger;
+                        
                         var $response = response;
                         if ($response.Success) {
                             if (url == '/Circle/Create') {
@@ -1096,7 +1096,7 @@
     // #region Polygon
 
     function GetPolygon(id, arrLatLngs, layerInfo) {
-        debugger;
+        
         let raw = {
             ID: id,
             LatLongs: [],
@@ -1228,7 +1228,7 @@
                     },
                     data: JSON.stringify(model),
                     success: function (response) {
-                        debugger;
+                        
                         var $response = response;
                         if ($response.Success) {
                             if (url == '/Polygon/Create') {
@@ -1535,7 +1535,7 @@
             success: function (response) {
                 var $response = response;
                 if ($response.Success == true) {
-                    debugger;
+                    
                     let Types = $response.Data.TypeMaps;
 
                     let paramsJson = {
@@ -1575,7 +1575,7 @@
                     }));
 
                     map.on(L.Draw.Event.CREATED, function (event) {
-                        debugger;
+                        
                         var layer = event.layer,
                             layerType = getLayerType(layer);
 
@@ -1616,7 +1616,7 @@
 
                     map.on(L.Draw.Event.EDITED, function (event) {
                         Object.values(event.layers._layers).forEach(function (item) {
-                            debugger;
+                            
                             let layer = item.editing;
 
                             if (typeof layer._marker !== 'undefined')  //Marker
@@ -1770,7 +1770,7 @@
 
 
                     drawItems.on('mouseover', function (event) {
-                        debugger;
+                        
                         var layer = event.layer,
                             layerType = getLayerType(layer);
                         if(layerType == 'Marker') {
@@ -1792,7 +1792,7 @@
                         
                     });
                     drawItems.on('mouseout', function (event) {
-                        debugger;
+                        
                         var layer = event.layer,
                             layerType = getLayerType(layer);
                         if(layerType == 'Marker') {
